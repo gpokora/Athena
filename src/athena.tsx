@@ -1367,6 +1367,8 @@ export class Athena extends React.Component {
       code: selDoc.code, title: selDoc.title, kind: selDoc.kind, collection: selDoc.collection,
       author: selDoc.author, date: selDoc.date, version: selDoc.version, size: selDoc.size,
       pages: selDoc.pages, abstract: selDoc.abstract,
+      hasPdf: !!selDoc.pdfDataUrl, noPdf: !selDoc.pdfDataUrl,
+      previewCanvas: selDoc.pdfDataUrl ? React.createElement(PdfPage, { src: selDoc.pdfDataUrl, pageNumber: 1, width: 360 }) : null,
       fileName: selDoc.code + '_' + selDoc.version + '.pdf',
       statusLabel: selDoc.status, statusStyle: this.statusChip(selDoc.status, false),
       meta: [

@@ -248,6 +248,10 @@
               <span>{{ selected.code }} · REV {{ selected.version }}</span>
               <span style="color:#a83a32;font-weight:700;">CONFIDENTIAL · INTERNAL</span>
             </div>
+            <sc-if value="{{ selected.hasPdf }}" hint-placeholder-val="{{ false }}">
+              <div style="background:#fff;display:flex;">{{ selected.previewCanvas }}</div>
+            </sc-if>
+            <sc-if value="{{ selected.noPdf }}" hint-placeholder-val="{{ true }}">
             <div style="padding:22px 26px 26px;">
               <div style="font-size:7.5px;letter-spacing:2px;color:#8a8a80;margin-bottom:7px;">{{ selected.collection }} · {{ selected.kind }}</div>
               <div style="font-size:16px;font-weight:700;line-height:1.25;color:#161613;margin-bottom:6px;">{{ selected.title }}</div>
@@ -275,6 +279,7 @@
                 <div style="height:5px;background:#d6d6cf;border-radius:1px;width:62%;"></div>
               </div>
             </div>
+            </sc-if>
             <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 16px;border-top:1px solid #d2d2cb;color:#9a9a90;font-size:7.5px;letter-spacing:.5px;">
               <span>{{ selected.code }}</span>
               <span>PAGE 1 OF {{ selected.pages }}</span>
