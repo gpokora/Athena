@@ -1,0 +1,22 @@
+/* Ported verbatim from the Athena design's <helmet> styles. */
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; }
+#root { height: 100%; }
+body { background: #0c0e0d; font-family: 'JetBrains Mono', ui-monospace, monospace; -webkit-font-smoothing: antialiased; }
+::selection { background: #3fb95033; }
+.scry { scrollbar-width: thin; scrollbar-color: #2a302d transparent; }
+.scry::-webkit-scrollbar { width: 9px; height: 9px; }
+.scry::-webkit-scrollbar-thumb { background: #2a302d; border-radius: 8px; border: 2px solid #0c0e0d; }
+.scry::-webkit-scrollbar-thumb:hover { background: #39413d; }
+.scry::-webkit-scrollbar-track { background: transparent; }
+* { scrollbar-width: thin; scrollbar-color: #2a302d transparent; }
+*::-webkit-scrollbar { width: 9px; height: 9px; }
+*::-webkit-scrollbar-thumb { background: #2a302d; border-radius: 8px; border: 2px solid #0c0e0d; }
+*::-webkit-scrollbar-thumb:hover { background: #39413d; }
+*::-webkit-scrollbar-track { background: transparent; }
+@keyframes dlblink { 0%,55% { opacity: 1; } 56%,100% { opacity: 0.15; } }
+@keyframes dlin { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+input::placeholder, textarea::placeholder { color: #9ea69f; }
+input:focus, textarea:focus, select:focus { outline: none; }
+::highlight(sf-all) { background: #ffe06b; color: #1a1a17; }
+::highlight(sf-cur) { background: #ff9e2c; color: #000; }

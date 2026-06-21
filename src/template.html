@@ -1,0 +1,1442 @@
+<div style="height:100vh;width:100%;display:grid;grid-template-rows:53px 1fr;background:#0c0e0d;color:#d6dbd8;overflow:hidden;">
+
+  <!-- ===== TOP BAR ===== -->
+  <header style="display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid #20251f;background:linear-gradient(#101312,#0e110f);">
+    <div style="display:flex;align-items:center;gap:14px;">
+      <div style="display:flex;align-items:center;gap:9px;">
+        <div style="width:13px;height:13px;background:#3fb950;clip-path:polygon(0 0,100% 0,0 100%);"></div>
+        <span style="font-weight:800;letter-spacing:1.5px;font-size:14px;color:#eef2ef;">ATHENA</span>
+      </div>
+      <span style="color:#3a403c;">/</span>
+      <span style="font-size:12px;color:#b6bcb7;letter-spacing:.3px;">technical document library</span>
+      <div style="display:flex;gap:2px;margin-left:8px;border:1px solid #232925;border-radius:7px;overflow:hidden;">
+        <button onClick="{{ onViewLibrary }}" style="{{ viewLibStyle }}">LIBRARY</button>
+        <button onClick="{{ onViewProjects }}" style="{{ viewProjStyle }}">PROJECTS {{ projectCountLabel }}</button>
+        <button onClick="{{ onViewSubmittals }}" style="{{ viewSubStyle }}">SUBMITTALS {{ versionCountLabel }}</button>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:18px;">
+      <div style="display:flex;align-items:center;gap:7px;font-size:11px;color:#abb2ac;">
+        <span style="width:7px;height:7px;border-radius:50%;background:#3fb950;animation:dlblink 2.4s infinite;"></span>
+        <span>{{ indexLabel }}</span>
+      </div>
+      <span style="font-size:11px;color:#a2a9a3;letter-spacing:.3px;">SYNCED 2m ago</span>
+      <div style="position:relative;">
+        <button onClick="{{ onToggleAccount }}" title="account" style="width:30px;height:30px;border-radius:50%;border:none;background:{{ accountAvatarBg }};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#06210d;cursor:pointer;font-family:inherit;padding:0;">{{ accountInitials }}</button>
+        <sc-if value="{{ accountOpen }}" hint-placeholder-val="{{ false }}">
+          <div onClick="{{ onCloseAccount }}" style="position:fixed;inset:0;z-index:59;"></div>
+          <div style="position:absolute;top:40px;right:0;z-index:60;width:250px;background:#141816;border:1px solid #2a302d;border-radius:10px;padding:6px;box-shadow:0 16px 40px rgba(0,0,0,.6);animation:dlin .14s ease both;">
+            <div style="display:flex;align-items:center;gap:11px;padding:9px 9px 12px;border-bottom:1px solid #1b201e;margin-bottom:5px;">
+              <div style="width:38px;height:38px;border-radius:50%;background:{{ accountAvatarBg }};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#06210d;flex:none;">{{ accountInitials }}</div>
+              <div style="display:flex;flex-direction:column;gap:2px;min-width:0;">
+                <span style="font-size:12.5px;font-weight:600;color:#eef2ef;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ account.name }}</span>
+                <span style="font-size:10px;color:#9ea69f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ account.email }}</span>
+              </div>
+            </div>
+            <button onClick="{{ onOpenAccountModal }}" style="display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:transparent;border:none;border-radius:6px;padding:8px 9px;color:#cdd3cf;font-family:inherit;font-size:11.5px;cursor:pointer;" style-hover="background:#1d2320;"><span style="color:#9ea69f;">{{ iUser }}</span> Account settings</button>
+            <button onClick="{{ onOpenSettingsFromAcct }}" style="display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:transparent;border:none;border-radius:6px;padding:8px 9px;color:#cdd3cf;font-family:inherit;font-size:11.5px;cursor:pointer;" style-hover="background:#1d2320;"><span style="color:#9ea69f;">{{ iSettings }}</span> App settings</button>
+            <div style="height:1px;background:#1b201e;margin:5px 4px;"></div>
+            <button onClick="{{ onSignOut }}" style="display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:transparent;border:none;border-radius:6px;padding:8px 9px;color:#c4544f;font-family:inherit;font-size:11.5px;cursor:pointer;" style-hover="background:#1a1210;">{{ iSignOut }} Sign out</button>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== MAIN VIEWS ===== -->
+  <div style="min-height:0;">
+  <sc-if value="{{ libView }}" hint-placeholder-val="{{ true }}">
+  <main style="height:100%;display:grid;grid-template-columns:282px minmax(360px,1fr) 472px;min-height:0;">
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="scry" style="border-right:1px solid #1b201e;background:#0e110f;overflow-y:auto;display:flex;flex-direction:column;">
+      <div style="position:sticky;top:0;z-index:2;padding:14px;background:#0e110f;border-bottom:1px solid #1b201e;">
+        <div style="display:flex;align-items:center;gap:9px;background:#15191700;border:1px solid #2a302d;border-radius:7px;padding:9px 11px;background:#121614;">
+          <span style="color:#3fb950;font-size:13px;">{{ iSearch }}</span>
+          <input value="{{ query }}" onChange="{{ onSearch }}" placeholder="search specs, ids, tags…" style="flex:1;background:transparent;border:none;color:#dfe4e1;font-family:inherit;font-size:12.5px;letter-spacing:.2px;padding:0;">
+        </div>
+      </div>
+
+      <div style="padding:12px 14px 22px;display:flex;flex-direction:column;gap:20px;">
+
+        <!-- favorites quick toggle -->
+        <button onClick="{{ onToggleFavOnly }}" style="{{ favOnlyStyle }}">
+          <span style="display:flex;align-items:center;gap:9px;"><span style="color:#3fb950;">{{ iStarOn }}</span> Favorites</span>
+          <span style="font-size:11px;color:#abb2ac;">{{ favCount }}</span>
+        </button>
+
+        <!-- collections -->
+        <section>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;">
+            <span style="font-size:10.5px;letter-spacing:1.5px;color:#a4aba5;font-weight:600;">CATEGORIES</span>
+            <span style="font-size:10px;color:#444b46;">{{ collectionTotal }}</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:1px;">
+            <sc-for list="{{ collectionRows }}" as="c" hint-placeholder-count="7">
+              <button onClick="{{ c.onClick }}" style="{{ c.style }}">
+                <span style="display:flex;align-items:center;gap:8px;overflow:hidden;"><span style="color:{{ c.dotColor }};">{{ iDot }}</span><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ c.name }}</span></span>
+                <span style="font-size:10.5px;color:#a4aba5;flex:none;">{{ c.count }}</span>
+              </button>
+            </sc-for>
+          </div>
+        </section>
+
+        <!-- type -->
+        <section>
+          <div style="font-size:10.5px;letter-spacing:1.5px;color:#a4aba5;font-weight:600;margin-bottom:9px;">TYPE</div>
+          <div style="display:flex;flex-direction:column;gap:1px;">
+            <sc-for list="{{ kindRows }}" as="k" hint-placeholder-count="5">
+              <button onClick="{{ k.onClick }}" style="{{ k.style }}">
+                <span style="display:flex;align-items:center;gap:9px;"><span style="color:{{ k.boxColor }};font-size:11px;">{{ k.box }}</span>{{ k.label }}</span>
+                <span style="font-size:10.5px;color:#a4aba5;">{{ k.count }}</span>
+              </button>
+            </sc-for>
+          </div>
+        </section>
+
+        <!-- status -->
+        <section>
+          <div style="font-size:10.5px;letter-spacing:1.5px;color:#a4aba5;font-weight:600;margin-bottom:9px;">STATUS</div>
+          <div style="display:flex;flex-direction:column;gap:1px;">
+            <sc-for list="{{ statusRows }}" as="s" hint-placeholder-count="4">
+              <button onClick="{{ s.onClick }}" style="{{ s.style }}">
+                <span style="display:flex;align-items:center;gap:9px;"><span style="width:8px;height:8px;border-radius:2px;background:{{ s.color }};display:inline-block;"></span>{{ s.label }}</span>
+                <span style="font-size:10.5px;color:#a4aba5;">{{ s.count }}</span>
+              </button>
+            </sc-for>
+          </div>
+        </section>
+
+        <!-- tags -->
+        <section>
+          <div style="font-size:10.5px;letter-spacing:1.5px;color:#a4aba5;font-weight:600;margin-bottom:10px;">TAGS</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;">
+            <sc-for list="{{ tagRows }}" as="t" hint-placeholder-count="9">
+              <button onClick="{{ t.onClick }}" style="{{ t.style }}">{{ t.label }}</button>
+            </sc-for>
+          </div>
+        </section>
+
+        <!-- recent -->
+        <section>
+          <div style="font-size:10.5px;letter-spacing:1.5px;color:#a4aba5;font-weight:600;margin-bottom:10px;">RECENT</div>
+          <div style="display:flex;flex-direction:column;gap:2px;">
+            <sc-for list="{{ recentDocs }}" as="r" hint-placeholder-count="3">
+              <button onClick="{{ r.onClick }}" style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;background:transparent;border:none;padding:7px 8px;border-radius:6px;cursor:pointer;font-family:inherit;width:100%;" style-hover="background:#141816;">
+                <span style="font-size:11px;color:#b3b9b4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;">{{ r.title }}</span>
+                <span style="font-size:9.5px;color:#a4aba5;letter-spacing:.4px;">{{ r.code }}</span>
+              </button>
+            </sc-for>
+          </div>
+        </section>
+
+      </div>
+    </aside>
+
+    <!-- ===== DOCUMENT LIST ===== -->
+    <section style="display:flex;flex-direction:column;min-height:0;border-right:1px solid #1b201e;background:#0c0e0d;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-bottom:1px solid #1b201e;background:#0e110f;">
+        <div style="display:flex;align-items:baseline;gap:10px;">
+          <span style="font-size:12.5px;color:#cdd3cf;font-weight:600;">{{ headerTitle }}</span>
+          <span style="font-size:11px;color:#a4aba5;">{{ resultCount }} of {{ totalCount }}</span>
+          <sc-if value="{{ filtersActive }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ onClearFilters }}" style="font-size:10.5px;color:#3fb950;background:transparent;border:none;cursor:pointer;font-family:inherit;padding:0;letter-spacing:.3px;">✕ clear filters</button>
+          </sc-if>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <button onClick="{{ onAddDocument }}" style="display:flex;align-items:center;gap:5px;height:27px;padding:0 11px;background:#13211a;border:1px solid #2a4a32;border-radius:6px;color:#5fd06f;font-weight:700;font-size:10.5px;letter-spacing:.3px;cursor:pointer;font-family:inherit;" style-hover="background:#18291f;">+ ADD</button>
+          <span style="width:1px;height:16px;background:#2a302d;"></span>
+          <span style="font-size:10px;color:#9ea69f;letter-spacing:.5px;">SORT</span>
+          <div style="display:flex;gap:1px;border:1px solid #232925;border-radius:6px;overflow:hidden;">
+            <sc-for list="{{ sortRows }}" as="o" hint-placeholder-count="3">
+              <button onClick="{{ o.onClick }}" style="{{ o.style }}">{{ o.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+
+      <div class="scry" style="flex:1;overflow-y:auto;min-height:0;">
+        <sc-if value="{{ hasResults }}" hint-placeholder-val="{{ true }}">
+          <sc-for list="{{ docs }}" as="d" hint-placeholder-count="9">
+            <div onClick="{{ d.onClick }}" onDoubleClick="{{ d.onDbl }}" style="{{ d.rowStyle }}">
+              <sc-if value="{{ showThumbs }}" hint-placeholder-val="{{ true }}">
+                <div style="{{ d.thumbStyle }}">
+                  <span style="font-size:8px;font-weight:700;letter-spacing:.5px;color:#b94f47;">PDF</span>
+                  <div style="width:22px;height:1.5px;background:#3a3a36;margin-top:3px;"></div>
+                  <div style="width:16px;height:1.5px;background:#3a3a36;margin-top:2px;"></div>
+                </div>
+              </sc-if>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:5px;">
+                <div style="display:flex;align-items:center;gap:9px;">
+                  <span style="font-size:9.5px;color:#5fae6a;letter-spacing:.5px;font-weight:600;flex:none;">{{ d.code }}</span>
+                  <span style="font-size:9.5px;color:#4a514c;">·</span>
+                  <span style="font-size:9.5px;color:#a4aba5;">{{ d.kind }}</span>
+                  <span style="{{ d.statusStyle }}">{{ d.statusLabel }}</span>
+                </div>
+                <div style="font-size:13px;color:#dde3df;font-weight:500;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;{{ d.titleDeco }}">{{ d.title }}</div>
+                <div style="display:flex;align-items:center;gap:10px;font-size:10.5px;color:#a7aea8;">
+                  <span>{{ d.author }}</span>
+                  <span style="color:#3a403c;">·</span>
+                  <span>{{ d.date }}</span>
+                  <span style="color:#3a403c;">·</span>
+                  <span>{{ d.version }}</span>
+                  <span style="color:#3a403c;">·</span>
+                  <span>{{ d.size }}</span>
+                </div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:1px;">
+                  <sc-for list="{{ d.tagChips }}" as="tc" hint-placeholder-count="3">
+                    <span style="font-size:9.5px;color:#b2b8b3;background:#15191700;border:1px solid #232925;border-radius:4px;padding:1.5px 6px;">{{ tc }}</span>
+                  </sc-for>
+                </div>
+              </div>
+              <button onClick="{{ d.onFav }}" style="{{ d.favStyle }}">{{ d.favIcon }}</button>
+            </div>
+          </sc-for>
+        </sc-if>
+        <sc-if value="{{ noResults }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px;color:#9ea69f;padding:40px;">
+            <span style="color:#2f3531;">{{ iDocBig }}</span>
+            <span style="font-size:12px;">no documents match your filters</span>
+            <button onClick="{{ onClearFilters }}" style="font-size:11px;color:#3fb950;background:transparent;border:1px solid #2a4a32;border-radius:6px;padding:6px 12px;cursor:pointer;font-family:inherit;">reset filters</button>
+          </div>
+        </sc-if>
+      </div>
+    </section>
+
+    <!-- ===== PREVIEW PANE ===== -->
+    <aside class="scry" style="overflow-y:auto;background:#0e110f;min-height:0;">
+      <!-- preview toolbar -->
+      <div style="position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;padding:11px 16px;background:#0e110f;border-bottom:1px solid #1b201e;">
+        <div style="display:flex;align-items:center;gap:8px;min-width:0;">
+          <span style="font-size:10px;color:#5fae6a;letter-spacing:.5px;font-weight:600;flex:none;">{{ selected.code }}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <button onClick="{{ onFavSelected }}" title="favorite" style="{{ selFavStyle }}">{{ selFavIcon }}</button>
+          <button onClick="{{ onShare }}" title="share" style="display:flex;align-items:center;justify-content:center;width:30px;height:30px;border:1px solid #262c28;background:#121614;border-radius:6px;color:#b3b9b4;cursor:pointer;font-size:13px;font-family:inherit;" style-hover="border-color:#39413d;color:#cdd3cf;">{{ iShare }}</button>
+          <button onClick="{{ onDownload }}" title="download" style="display:flex;align-items:center;justify-content:center;width:30px;height:30px;border:1px solid #262c28;background:#121614;border-radius:6px;color:#b3b9b4;cursor:pointer;font-size:13px;font-family:inherit;" style-hover="border-color:#39413d;color:#cdd3cf;">{{ iDownload }}</button>
+          <div style="position:relative;display:flex;">
+            <button onClick="{{ onOpen }}" style="display:flex;align-items:center;gap:7px;height:30px;padding:0 11px;background:#3fb950;border:none;border-radius:6px 0 0 6px;color:#06210d;font-weight:700;font-size:11.5px;letter-spacing:.4px;cursor:pointer;font-family:inherit;" style-hover="background:#4fce62;">OPEN {{ iExternal }}</button>
+            <button onClick="{{ onToggleMenu }}" title="open options" style="display:flex;align-items:center;justify-content:center;height:30px;width:24px;background:#34a847;border:none;border-left:1px solid #2c8f3c;border-radius:0 6px 6px 0;color:#06210d;font-size:10px;cursor:pointer;font-family:inherit;" style-hover="background:#3cba50;">{{ iCaret }}</button>
+            <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;top:36px;right:0;z-index:20;width:236px;background:#13171500;background:#141816;border:1px solid #2a302d;border-radius:8px;padding:5px;box-shadow:0 14px 36px rgba(0,0,0,.6);display:flex;flex-direction:column;gap:1px;animation:dlin .14s ease both;">
+                <button onClick="{{ onOpen }}" style="display:flex;align-items:center;gap:11px;padding:9px 10px;background:transparent;border:none;border-radius:6px;cursor:pointer;font-family:inherit;text-align:left;color:#cdd3cf;" style-hover="background:#1d2320;">
+                  <span style="font-size:13px;color:#3fb950;flex:none;">{{ iMax }}</span>
+                  <span style="display:flex;flex-direction:column;gap:1px;"><span style="font-size:11.5px;font-weight:600;">Open in viewer</span><span style="font-size:9.5px;color:#a7aea8;">in-browser full-size preview</span></span>
+                </button>
+                <button onClick="{{ onOpenDesktop }}" style="display:flex;align-items:center;gap:11px;padding:9px 10px;background:transparent;border:none;border-radius:6px;cursor:pointer;font-family:inherit;text-align:left;color:#cdd3cf;" style-hover="background:#1d2320;">
+                  <span style="font-size:13px;color:#3fb950;flex:none;">{{ iExternal }}</span>
+                  <span style="display:flex;flex-direction:column;gap:1px;"><span style="font-size:11.5px;font-weight:600;">Open in desktop app</span><span style="font-size:9.5px;color:#a7aea8;">default PDF application</span></span>
+                </button>
+                <button onClick="{{ onDownload }}" style="display:flex;align-items:center;gap:11px;padding:9px 10px;background:transparent;border:none;border-radius:6px;cursor:pointer;font-family:inherit;text-align:left;color:#cdd3cf;" style-hover="background:#1d2320;">
+                  <span style="font-size:13px;color:#b3b9b4;flex:none;">{{ iDownload }}</span>
+                  <span style="display:flex;flex-direction:column;gap:1px;"><span style="font-size:11.5px;font-weight:600;">Download</span><span style="font-size:9.5px;color:#a7aea8;">{{ selected.size }} · PDF</span></span>
+                </button>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+      </div>
+      <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+        <div onClick="{{ onToggleMenu }}" style="position:fixed;inset:0;z-index:10;"></div>
+      </sc-if>
+
+      <div style="padding:18px;">
+        <!-- page preview (paper) -->
+        <div key="{{ selected.code }}" style="animation:dlin .28s ease both;">
+          <div style="background:#ecece6;border-radius:3px;box-shadow:0 10px 30px rgba(0,0,0,.55),0 0 0 1px #000;overflow:hidden;color:#1b1b18;font-size:9px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 16px;border-bottom:1px solid #d2d2cb;color:#6a6a62;letter-spacing:.5px;font-size:8px;">
+              <span>{{ selected.code }} · REV {{ selected.version }}</span>
+              <span style="color:#a83a32;font-weight:700;">CONFIDENTIAL · INTERNAL</span>
+            </div>
+            <div style="padding:22px 26px 26px;">
+              <div style="font-size:7.5px;letter-spacing:2px;color:#8a8a80;margin-bottom:7px;">{{ selected.collection }} · {{ selected.kind }}</div>
+              <div style="font-size:16px;font-weight:700;line-height:1.25;color:#161613;margin-bottom:6px;">{{ selected.title }}</div>
+              <div style="display:flex;gap:18px;font-size:8px;color:#6a6a62;margin-bottom:18px;border-bottom:1px solid #dadad3;padding-bottom:12px;">
+                <span>{{ selected.author }}</span><span>{{ selected.date }}</span><span>{{ selected.size }}</span>
+              </div>
+
+              <div style="font-size:9px;font-weight:700;color:#2a2a26;margin-bottom:8px;letter-spacing:.5px;">1.&nbsp;&nbsp;SCOPE</div>
+              <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:18px;">
+                <div style="height:5px;background:#d6d6cf;border-radius:1px;width:100%;"></div>
+                <div style="height:5px;background:#d6d6cf;border-radius:1px;width:96%;"></div>
+                <div style="height:5px;background:#d6d6cf;border-radius:1px;width:88%;"></div>
+                <div style="height:5px;background:#d6d6cf;border-radius:1px;width:40%;"></div>
+              </div>
+
+              <div style="font-size:9px;font-weight:700;color:#2a2a26;margin-bottom:8px;letter-spacing:.5px;">2.&nbsp;&nbsp;REFERENCE ARCHITECTURE</div>
+              <div style="border:1px solid #cdcdc4;border-radius:2px;height:128px;display:flex;align-items:center;justify-content:center;margin-bottom:8px;background:repeating-linear-gradient(45deg,#e0e0d9,#e0e0d9 7px,#e7e7e0 7px,#e7e7e0 14px);">
+                <span style="font-size:8px;letter-spacing:1px;color:#8a8a80;background:#ecece6;padding:3px 9px;border-radius:2px;">FIG. 1 — system block diagram</span>
+              </div>
+              <div style="text-align:center;font-size:7px;color:#9a9a90;margin-bottom:18px;">drop rendered page / figure here</div>
+
+              <div style="display:flex;flex-direction:column;gap:5px;">
+                <div style="height:5px;background:#d6d6cf;border-radius:1px;width:92%;"></div>
+                <div style="height:5px;background:#d6d6cf;border-radius:1px;width:100%;"></div>
+                <div style="height:5px;background:#d6d6cf;border-radius:1px;width:62%;"></div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 16px;border-top:1px solid #d2d2cb;color:#9a9a90;font-size:7.5px;letter-spacing:.5px;">
+              <span>{{ selected.code }}</span>
+              <span>PAGE 1 OF {{ selected.pages }}</span>
+            </div>
+          </div>
+          <!-- page nav -->
+          <div style="display:flex;align-items:center;justify-content:center;gap:14px;padding:11px 0 4px;color:#abb2ac;font-size:11px;">
+            <span style="cursor:pointer;">{{ iPrev }}</span>
+            <span>1 / {{ selected.pages }}</span>
+            <span style="cursor:pointer;">{{ iNext }}</span>
+          </div>
+        </div>
+
+        <!-- abstract -->
+        <div style="margin-top:14px;font-size:11.5px;line-height:1.6;color:#b3b9b4;">{{ selected.abstract }}</div>
+
+        <!-- metadata -->
+        <div style="margin-top:20px;border-top:1px solid #1f2421;padding-top:16px;">
+          <div style="font-size:10.5px;letter-spacing:1.5px;color:#a4aba5;font-weight:600;margin-bottom:12px;">METADATA</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px 16px;">
+              <div style="display:flex;flex-direction:column;gap:4px;"><span style="font-size:9.5px;letter-spacing:.5px;color:#9ea69f;text-transform:uppercase;">Status</span><select value="{{ statusValue }}" onChange="{{ onSetStatus }}" style="background:#121614;border:1px solid #262c28;width:100%;box-sizing:border-box;border-radius:6px;padding:6px 9px;color:#dfe4e1;font-family:inherit;font-size:11.5px;cursor:pointer;"><option value="Approved">Approved</option><option value="Review">Review</option><option value="Draft">Draft</option><option value="Deprecated">Deprecated</option></select></div>
+              <div style="display:flex;flex-direction:column;gap:4px;"><span style="font-size:9.5px;letter-spacing:.5px;color:#9ea69f;text-transform:uppercase;">Category</span><select value="{{ collectionValue }}" onChange="{{ onSetCollection }}" style="background:#121614;border:1px solid #262c28;width:100%;box-sizing:border-box;border-radius:6px;padding:6px 9px;color:#dfe4e1;font-family:inherit;font-size:11.5px;cursor:pointer;"><sc-for list="{{ collOptions }}" as="c" hint-placeholder-count="3"><option value="{{ c }}">{{ c }}</option></sc-for></select></div>
+              <div style="display:flex;flex-direction:column;gap:4px;"><span style="font-size:9.5px;letter-spacing:.5px;color:#9ea69f;text-transform:uppercase;">Part Number</span><input value="{{ partNumber }}" onChange="{{ onMetaPart }}" style="background:#121614;border:1px solid #262c28;width:100%;box-sizing:border-box;border-radius:6px;padding:6px 9px;color:#dfe4e1;font-family:inherit;font-size:11.5px;"></div>
+              <div style="display:flex;flex-direction:column;gap:4px;"><span style="font-size:9.5px;letter-spacing:.5px;color:#9ea69f;text-transform:uppercase;">Type</span><select value="{{ mdKind }}" onChange="{{ onMetaType }}" style="background:#121614;border:1px solid #262c28;width:100%;box-sizing:border-box;border-radius:6px;padding:6px 9px;color:#dfe4e1;font-family:inherit;font-size:11.5px;cursor:pointer;"><sc-for list="{{ typeOptions }}" as="t" hint-placeholder-count="3"><option value="{{ t }}">{{ t }}</option></sc-for></select></div>
+              <div style="display:flex;flex-direction:column;gap:4px;"><span style="font-size:9.5px;letter-spacing:.5px;color:#9ea69f;text-transform:uppercase;">Manufacturer</span><select value="{{ mdAuthor }}" onChange="{{ onMetaOwner }}" style="background:#121614;border:1px solid #262c28;width:100%;box-sizing:border-box;border-radius:6px;padding:6px 9px;color:#dfe4e1;font-family:inherit;font-size:11.5px;cursor:pointer;"><sc-for list="{{ mfrOptions }}" as="m" hint-placeholder-count="3"><option value="{{ m }}">{{ m }}</option></sc-for></select></div>
+              <div style="display:flex;flex-direction:column;gap:4px;"><span style="font-size:9.5px;letter-spacing:.5px;color:#9ea69f;text-transform:uppercase;">Updated</span><input value="{{ selected.date }}" readonly="" style="background:#0c0f0e;border:1px solid #262c28;width:100%;box-sizing:border-box;border-radius:6px;padding:6px 9px;color:#b3b9b4;font-family:inherit;font-size:11.5px;cursor:not-allowed;"></div>
+              <div style="display:flex;flex-direction:column;gap:4px;"><span style="font-size:9.5px;letter-spacing:.5px;color:#9ea69f;text-transform:uppercase;">Revision</span><input value="{{ mdVersion }}" onChange="{{ onMetaRev }}" style="background:#121614;border:1px solid #262c28;width:100%;box-sizing:border-box;border-radius:6px;padding:6px 9px;color:#dfe4e1;font-family:inherit;font-size:11.5px;"></div>
+              <div style="display:flex;flex-direction:column;gap:4px;"><span style="font-size:9.5px;letter-spacing:.5px;color:#9ea69f;text-transform:uppercase;">File size</span><input value="{{ selected.size }}" readonly="" style="background:#0c0f0e;border:1px solid #262c28;width:100%;box-sizing:border-box;border-radius:6px;padding:6px 9px;color:#b3b9b4;font-family:inherit;font-size:11.5px;cursor:not-allowed;"></div>
+              <div style="display:flex;flex-direction:column;gap:4px;"><span style="font-size:9.5px;letter-spacing:.5px;color:#9ea69f;text-transform:uppercase;">Pages</span><input value="{{ selected.pages }}" readonly="" style="background:#0c0f0e;border:1px solid #262c28;width:100%;box-sizing:border-box;border-radius:6px;padding:6px 9px;color:#b3b9b4;font-family:inherit;font-size:11.5px;cursor:not-allowed;"></div>
+              <div style="display:flex;flex-direction:column;gap:4px;"><span style="font-size:9.5px;letter-spacing:.5px;color:#9ea69f;text-transform:uppercase;">File name</span><input value="{{ selected.fileName }}" readonly="" style="background:#0c0f0e;border:1px solid #262c28;width:100%;box-sizing:border-box;border-radius:6px;padding:6px 9px;color:#b3b9b4;font-family:inherit;font-size:11.5px;cursor:not-allowed;"></div>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:14px;">
+            <sc-for list="{{ selTagItems }}" as="t" hint-placeholder-count="3">
+              <span style="display:flex;align-items:center;gap:5px;font-size:10px;color:#b2b8b3;background:#121614;border:1px solid #232925;border-radius:4px;padding:3px 6px 3px 8px;">#{{ t.tag }}<span onClick="{{ t.onRemove }}" style="cursor:pointer;color:#6b726d;font-size:9px;">{{ iCloseSm }}</span></span>
+            </sc-for>
+            <input value="{{ newTag }}" onInput="{{ onNewTagInput }}" onKeyDown="{{ onNewTagKey }}" placeholder="+ tag" style="width:64px;background:#0c0f0e;border:1px solid #232925;border-radius:4px;padding:3px 7px;color:#dfe4e1;font-family:inherit;font-size:10px;">
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:18px;border-top:1px solid #1f2421;padding-top:16px;">
+            <sc-if value="{{ mdDirty }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ onSaveDoc }}" style="flex:none;height:28px;padding:0 12px;background:#3fb950;border:none;border-radius:6px;color:#06210d;font-weight:700;font-size:10.5px;letter-spacing:.3px;cursor:pointer;font-family:inherit;" style-hover="background:#4fce62;">Save Changes</button>
+            </sc-if>
+            <div style="flex:1;"></div>
+            <button onClick="{{ onDeleteDocument }}" title="delete document" style="flex:none;display:flex;align-items:center;gap:6px;height:34px;padding:0 14px;border:1px solid #3a2422;background:#1a1210;border-radius:7px;color:#c4544f;cursor:pointer;font-size:11px;font-family:inherit;" style-hover="border-color:#5a3430;">{{ iTrash }} Delete</button>
+          </div>
+        </div>
+
+        <!-- version history -->
+        <div style="margin-top:22px;border-top:1px solid #1f2421;padding-top:16px;padding-bottom:20px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:13px;">
+            <span style="font-size:10.5px;letter-spacing:1.5px;color:#a4aba5;font-weight:600;">VERSION HISTORY</span>
+            <span style="font-size:10px;color:#444b46;">{{ versionCount }} revisions</span>
+          </div>
+          <div style="display:flex;flex-direction:column;">
+            <sc-for list="{{ versions }}" as="v" hint-placeholder-count="4">
+              <div style="{{ v.rowStyle }}">
+                <div style="display:flex;flex-direction:column;align-items:center;flex:none;width:14px;">
+                  <span style="width:9px;height:9px;border-radius:50%;background:{{ v.dot }};border:2px solid #0e110f;"></span>
+                  <sc-if value="{{ v.line }}" hint-placeholder-val="{{ true }}">
+                    <span style="width:1.5px;flex:1;background:#232925;min-height:28px;margin-top:1px;"></span>
+                  </sc-if>
+                </div>
+                <div style="flex:1;display:flex;flex-direction:column;gap:3px;padding-bottom:14px;">
+                  <div style="display:flex;align-items:center;gap:9px;">
+                    <span style="font-size:11.5px;font-weight:600;color:{{ v.vColor }};">{{ v.v }}</span>
+                    <sc-if value="{{ v.current }}" hint-placeholder-val="{{ false }}">
+                      <span style="font-size:8.5px;color:#3fb950;border:1px solid #2a4a32;border-radius:3px;padding:1px 5px;letter-spacing:.5px;">CURRENT</span>
+                    </sc-if>
+                    <span style="font-size:10px;color:#9ea69f;margin-left:auto;">{{ v.date }}</span>
+                  </div>
+                  <div style="font-size:10.5px;color:#b2b8b3;line-height:1.4;">{{ v.note }}</div>
+                  <div style="font-size:9.5px;color:#9ea69f;">{{ v.author }}</div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+  </main>
+  </sc-if>
+
+  <sc-if value="{{ subMgrView }}" hint-placeholder-val="{{ false }}">
+    <div style="height:100%;display:flex;flex-direction:column;background:#0c0e0d;min-height:0;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid #1b201e;background:#0e110f;">
+        <div style="display:flex;align-items:baseline;gap:12px;">
+          <span style="font-size:16px;font-weight:700;color:#eef2ef;letter-spacing:.3px;">Submittals</span>
+          <span style="font-size:12px;color:#a4aba5;">{{ versionCount }} saved versions</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="display:flex;align-items:center;gap:8px;background:#121614;border:1px solid #2a302d;border-radius:7px;padding:7px 11px;width:230px;">
+            <span style="color:#5fae6a;flex:none;display:flex;">{{ iSearch }}</span>
+            <input value="{{ subQuery }}" onInput="{{ onSubQuery }}" placeholder="search submittals…" style="flex:1;min-width:0;background:transparent;border:none;color:#dfe4e1;font-family:inherit;font-size:12px;">
+          </div>
+          <select value="{{ subFilterStatus }}" onChange="{{ onSubFilterStatus }}" style="height:32px;background:#121614;border:1px solid #2a302d;border-radius:7px;padding:0 8px;color:#cdd3cf;font-family:inherit;font-size:11.5px;cursor:pointer;"><sc-for list="{{ subStatusOptions }}" as="o" hint-placeholder-count="3"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></select>
+          <button onClick="{{ onNewSubmittal }}" style="display:flex;align-items:center;gap:8px;height:32px;padding:0 14px;background:#13211a;border:1px solid #2a4a32;border-radius:7px;color:#5fd06f;font-weight:700;font-size:11.5px;letter-spacing:.4px;cursor:pointer;font-family:inherit;" style-hover="background:#18291f;border-color:#3a6042;">+ NEW SUBMITTAL</button>
+        </div>
+      </div>
+      <div class="scry" style="flex:1;overflow-y:auto;min-height:0;padding:22px 24px 40px;">
+        <sc-if value="{{ hasVersions }}" hint-placeholder-val="{{ false }}">
+          <div style="border:1px solid #1f2421;border-radius:9px;overflow:hidden;">
+            <div style="{{ subHeaderStyle }}">
+              <span onClick="{{ sortSub.project }}" style="position:relative;border-right:1px solid #2a302d;cursor:pointer;">PROJECT {{ sortSubInd.project }}<span onMouseDown="{{ res.sub0 }}" style="position:absolute;right:-6px;top:-9px;bottom:-9px;width:11px;cursor:col-resize;"></span></span>
+              <span onClick="{{ sortSub.status }}" style="position:relative;border-right:1px solid #2a302d;cursor:pointer;">STATUS {{ sortSubInd.status }}<span onMouseDown="{{ res.sub1 }}" style="position:absolute;right:-6px;top:-9px;bottom:-9px;width:11px;cursor:col-resize;"></span></span>
+              <span onClick="{{ sortSub.rev }}" style="position:relative;border-right:1px solid #2a302d;cursor:pointer;">REV {{ sortSubInd.rev }}<span onMouseDown="{{ res.sub2 }}" style="position:absolute;right:-6px;top:-9px;bottom:-9px;width:11px;cursor:col-resize;"></span></span>
+              <span onClick="{{ sortSub.date }}" style="position:relative;border-right:1px solid #2a302d;cursor:pointer;">DATE {{ sortSubInd.date }}<span onMouseDown="{{ res.sub3 }}" style="position:absolute;right:-6px;top:-9px;bottom:-9px;width:11px;cursor:col-resize;"></span></span>
+              <span onClick="{{ sortSub.versions }}" style="position:relative;border-right:1px solid #2a302d;cursor:pointer;">VERSIONS {{ sortSubInd.versions }}<span onMouseDown="{{ res.sub4 }}" style="position:absolute;right:-6px;top:-9px;bottom:-9px;width:11px;cursor:col-resize;"></span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <sc-for list="{{ submittalGroups }}" as="g" hint-placeholder-count="3">
+              <div style="border-bottom:1px solid #14181666;">
+                <div onClick="{{ g.onToggle }}" style="{{ g.rowStyle }}" style-hover="background:#101413;">
+                  <span style="display:flex;align-items:center;gap:9px;min-width:0;"><span style="color:#5fae6a;font-size:9px;flex:none;">{{ g.chevron }}</span><span style="font-weight:600;color:#dde3df;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ g.project }}</span></span>
+                  <span><span style="font-size:8.5px;letter-spacing:.5px;font-weight:600;text-transform:uppercase;color:#5fd06f;background:#13211a;border:1px solid #2a4a32;border-radius:4px;padding:3px 7px;">{{ g.statusLabel }}</span></span>
+                  <span style="color:#b3b9b4;">{{ g.rev }}</span>
+                  <span style="color:#b3b9b4;">{{ g.dateLabel }}</span>
+                  <span style="color:#a7aea8;font-size:10.5px;">{{ g.countLabel }}</span>
+                  <span style="display:flex;justify-content:flex-end;">
+                    <button onClick="{{ g.onOpenLatest }}" style="height:26px;padding:0 11px;background:#3fb950;border:none;border-radius:6px;color:#06210d;font-weight:700;font-size:10px;letter-spacing:.3px;cursor:pointer;font-family:inherit;" style-hover="background:#4fce62;">OPEN</button>
+                  </span>
+                  <span></span>
+                </div>
+                <sc-if value="{{ g.expanded }}" hint-placeholder-val="{{ false }}">
+                  <div style="background:#0a0d0c;">
+                    <sc-for list="{{ g.versions }}" as="v" hint-placeholder-count="2">
+                      <div onDoubleClick="{{ v.onOpen }}" style="display:flex;align-items:center;gap:14px;padding:8px 16px 8px 37px;font-size:11px;color:#b3b9b4;border-top:1px solid #12161499;cursor:pointer;" style-hover="background:#101413;">
+                        <span style="font-weight:600;color:#cdd3cf;flex:none;width:70px;">{{ v.rev }}</span>
+                        <span style="flex:none;width:96px;">{{ v.dateLabel }}</span>
+                        <span style="flex:1;color:#a7aea8;font-size:10px;min-width:0;">Created {{ v.created }}<sc-if value="{{ v.wasModified }}" hint-placeholder-val="{{ false }}"><span style="color:#6b726d;"> · Modified {{ v.modified }}</span></sc-if></span>
+                        <span style="display:flex;gap:6px;justify-content:flex-end;flex:none;">
+                          <button onClick="{{ v.onOpen }}" style="height:25px;padding:0 10px;background:#161a18;border:1px solid #2a302d;border-radius:6px;color:#cdd3cf;font-size:10px;letter-spacing:.3px;cursor:pointer;font-family:inherit;" style-hover="border-color:#39413d;">OPEN</button>
+                          <button onClick="{{ v.onDelete }}" title="delete" style="display:flex;align-items:center;justify-content:center;flex:none;width:26px;height:25px;background:#1a1210;border:1px solid #3a2422;border-radius:6px;color:#c4544f;cursor:pointer;font-size:10px;font-family:inherit;" style-hover="border-color:#5a3430;">{{ iClose }}</button>
+                        </span>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ noVersions }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:14px;color:#9ea69f;padding:60px;">
+            <span style="color:#2f3531;">{{ iLayersBig }}</span>
+            <span style="font-size:13px;">No saved submittals yet</span>
+            <button onClick="{{ onNewSubmittal }}" style="font-size:11.5px;color:#5fd06f;background:#13211a;border:1px solid #2a4a32;border-radius:7px;padding:8px 16px;cursor:pointer;font-family:inherit;letter-spacing:.4px;">+ Generate a submittal</button>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ projView }}" hint-placeholder-val="{{ false }}">
+    <div style="height:100%;display:flex;flex-direction:column;background:#0c0e0d;min-height:0;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid #1b201e;background:#0e110f;">
+        <div style="display:flex;align-items:baseline;gap:12px;">
+          <span style="font-size:16px;font-weight:700;color:#eef2ef;letter-spacing:.3px;">Projects</span>
+          <span style="font-size:12px;color:#a4aba5;">{{ projectCount }} in repository</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="display:flex;align-items:center;gap:8px;background:#121614;border:1px solid #2a302d;border-radius:7px;padding:7px 11px;width:230px;">
+            <span style="color:#5fae6a;flex:none;display:flex;">{{ iSearch }}</span>
+            <input value="{{ projQuery }}" onInput="{{ onProjQuery }}" placeholder="search projects…" style="flex:1;min-width:0;background:transparent;border:none;color:#dfe4e1;font-family:inherit;font-size:12px;">
+          </div>
+          <button onClick="{{ onAddProject }}" style="display:flex;align-items:center;gap:6px;height:30px;padding:0 13px;background:#13211a;border:1px solid #2a4a32;border-radius:7px;color:#5fd06f;font-weight:700;font-size:11px;letter-spacing:.3px;cursor:pointer;font-family:inherit;" style-hover="background:#16271c;">{{ iPlus }} ADD PROJECT</button>
+        </div>
+      </div>
+      <div class="scry" style="{{ projGridCols }}">
+        <sc-if value="{{ projFormOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="border-right:1px solid #1b201e;padding:20px;display:flex;flex-direction:column;gap:13px;background:#0e110f;">
+          <div style="font-size:10.5px;letter-spacing:1.5px;color:#a4aba5;font-weight:600;">{{ projFormTitle }}</div>
+          <div><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Project name</label><input value="{{ projDraft.name }}" onChange="{{ onDraftName }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"></div>
+          <div><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Project number</label><input value="{{ projDraft.number }}" onChange="{{ onDraftNumber }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"></div>
+          <div><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Street address</label><input value="{{ projDraft.address }}" onChange="{{ onDraftAddress }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"></div>
+          <div style="display:flex;gap:8px;"><div style="flex:1;"><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">City</label><input value="{{ projDraft.city }}" onChange="{{ onDraftCity }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"></div><div style="width:60px;"><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">State</label><input value="{{ projDraft.state }}" onChange="{{ onDraftState }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"></div><div style="width:84px;"><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">ZIP</label><input value="{{ projDraft.zip }}" onChange="{{ onDraftZip }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"></div></div>
+          <div><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Project manager</label><input value="{{ projDraft.manager }}" onChange="{{ onDraftManager }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"></div>
+          <div><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Designer</label><input value="{{ projDraft.designer }}" onChange="{{ onDraftDesigner }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"></div>
+          <div style="display:flex;gap:8px;margin-top:4px;">
+            <button onClick="{{ onSaveProject }}" style="flex:1;height:34px;background:#3fb950;border:none;border-radius:7px;color:#06210d;font-weight:700;font-size:11.5px;letter-spacing:.4px;cursor:pointer;font-family:inherit;" style-hover="background:#4fce62;">{{ projSaveLabel }}</button>
+            <button onClick="{{ onCancelProject }}" style="flex:none;height:34px;padding:0 16px;background:#161a18;border:1px solid #2a302d;border-radius:7px;color:#cdd3cf;font-weight:600;font-size:11.5px;letter-spacing:.4px;cursor:pointer;font-family:inherit;" style-hover="border-color:#39413d;">Cancel</button>
+          </div>
+        </div>
+        </sc-if>
+        <div style="padding:20px;min-width:0;">
+          <sc-if value="{{ hasProjects }}" hint-placeholder-val="{{ false }}">
+            <div style="border:1px solid #1f2421;border-radius:9px;overflow:hidden;">
+              <div style="{{ projHeaderStyle }}">
+                <span onClick="{{ sortProj.project }}" style="position:relative;border-right:1px solid #2a302d;cursor:pointer;">PROJECT {{ sortProjInd.project }}<span onMouseDown="{{ res.proj0 }}" style="position:absolute;right:-6px;top:-9px;bottom:-9px;width:11px;cursor:col-resize;"></span></span>
+                <span onClick="{{ sortProj.number }}" style="position:relative;border-right:1px solid #2a302d;cursor:pointer;">NUMBER {{ sortProjInd.number }}<span onMouseDown="{{ res.proj1 }}" style="position:absolute;right:-6px;top:-9px;bottom:-9px;width:11px;cursor:col-resize;"></span></span>
+                <span onClick="{{ sortProj.address }}" style="position:relative;border-right:1px solid #2a302d;cursor:pointer;">ADDRESS {{ sortProjInd.address }}<span onMouseDown="{{ res.proj2 }}" style="position:absolute;right:-6px;top:-9px;bottom:-9px;width:11px;cursor:col-resize;"></span></span>
+                <span onClick="{{ sortProj.manager }}" style="position:relative;border-right:1px solid #2a302d;cursor:pointer;">MANAGER {{ sortProjInd.manager }}<span onMouseDown="{{ res.proj3 }}" style="position:absolute;right:-6px;top:-9px;bottom:-9px;width:11px;cursor:col-resize;"></span></span>
+                <span onClick="{{ sortProj.designer }}" style="position:relative;border-right:1px solid #2a302d;cursor:pointer;">DESIGNER {{ sortProjInd.designer }}<span onMouseDown="{{ res.proj4 }}" style="position:absolute;right:-6px;top:-9px;bottom:-9px;width:11px;cursor:col-resize;"></span></span>
+                <span></span>
+                <span></span>
+              </div>
+              <sc-for list="{{ projectRows }}" as="p" hint-placeholder-count="3">
+                <div>
+                <div onClick="{{ p.onSelect }}" style="{{ p.rowStyle }}" style-hover="background:#101413;">
+                  <span style="display:flex;align-items:center;gap:8px;min-width:0;"><span style="color:#5fae6a;font-size:9px;flex:none;">{{ p.chevron }}</span><span style="font-weight:600;color:#dde3df;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ p.name }}</span></span>
+                  <span style="color:#b3b9b4;">{{ p.number }}</span>
+                  <span style="color:#b2b8b3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ p.address }}</span>
+                  <span style="color:#b3b9b4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ p.manager }}</span>
+                  <span style="color:#b3b9b4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ p.designer }}</span>
+                  <span style="display:flex;gap:6px;justify-content:flex-end;">
+                    <button onClick="{{ p.onUse }}" title="new submittal" style="height:26px;padding:0 10px;background:#3fb950;border:none;border-radius:6px;color:#06210d;font-weight:700;font-size:10px;letter-spacing:.3px;cursor:pointer;font-family:inherit;" style-hover="background:#4fce62;">+ SUB</button>
+                    <button onClick="{{ p.onEdit }}" title="edit" style="display:flex;align-items:center;justify-content:center;flex:none;width:28px;height:26px;background:#161a18;border:1px solid #2a302d;border-radius:6px;color:#b3b9b4;cursor:pointer;font-size:11px;font-family:inherit;" style-hover="border-color:#39413d;color:#cdd3cf;">{{ iEdit }}</button>
+                    <button onClick="{{ p.onDelete }}" title="delete" style="display:flex;align-items:center;justify-content:center;flex:none;width:28px;height:26px;background:#1a1210;border:1px solid #3a2422;border-radius:6px;color:#c4544f;cursor:pointer;font-size:10px;font-family:inherit;" style-hover="border-color:#5a3430;">{{ iClose }}</button>
+                  </span>
+                  <span></span>
+                </div>
+                <sc-if value="{{ p.expanded }}" hint-placeholder-val="{{ false }}">
+                  <div style="background:#0a0d0c;border-bottom:1px solid #14181666;">
+                    <sc-if value="{{ p.hasSubs }}" hint-placeholder-val="{{ false }}">
+                      <sc-for list="{{ p.submittals }}" as="v" hint-placeholder-count="2">
+                        <div onDoubleClick="{{ v.onOpen }}" style="display:flex;align-items:center;gap:14px;padding:8px 16px 8px 37px;font-size:11px;color:#b3b9b4;border-top:1px solid #12161499;cursor:pointer;" style-hover="background:#101413;">
+                          <span style="font-weight:600;color:#cdd3cf;flex:none;width:64px;">{{ v.rev }}</span>
+                          <span style="flex:none;width:88px;">{{ v.dateLabel }}</span>
+                          <span style="flex:1;color:#a7aea8;font-size:10px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ v.status }} · Created {{ v.created }}</span>
+                          <span style="display:flex;gap:6px;justify-content:flex-end;flex:none;">
+                            <button onClick="{{ v.onOpen }}" style="height:25px;padding:0 10px;background:#161a18;border:1px solid #2a302d;border-radius:6px;color:#cdd3cf;font-size:10px;letter-spacing:.3px;cursor:pointer;font-family:inherit;" style-hover="border-color:#39413d;">OPEN</button>
+                            <button onClick="{{ v.onDelete }}" title="delete" style="display:flex;align-items:center;justify-content:center;flex:none;width:26px;height:25px;background:#1a1210;border:1px solid #3a2422;border-radius:6px;color:#c4544f;cursor:pointer;font-size:10px;font-family:inherit;" style-hover="border-color:#5a3430;">{{ iClose }}</button>
+                          </span>
+                        </div>
+                      </sc-for>
+                    </sc-if>
+                    <sc-if value="{{ p.noSubs }}" hint-placeholder-val="{{ true }}">
+                      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 16px 11px 37px;border-top:1px solid #12161499;">
+                        <span style="font-size:10.5px;color:#9ea69f;">No submittals for this project yet.</span>
+                        <button onClick="{{ p.onUse }}" style="height:25px;padding:0 11px;background:#13211a;border:1px solid #2a4a32;border-radius:6px;color:#5fd06f;font-weight:700;font-size:10px;letter-spacing:.3px;cursor:pointer;font-family:inherit;">+ NEW SUBMITTAL</button>
+                      </div>
+                    </sc-if>
+                  </div>
+                </sc-if>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ noProjects }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px;color:#9ea69f;padding:50px;">
+              <span style="color:#2f3531;">{{ iFolderBig }}</span>
+              <span style="font-size:13px;">No projects yet</span>
+              <span style="font-size:11px;color:#a7aea8;">Add a project on the left to reuse its info across submittals.</span>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  </div>
+
+  <!-- ===== ADD DOCUMENT MODAL ===== -->
+  <sc-if value="{{ docFormOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:70;background:rgba(6,8,7,.78);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;animation:dlin .16s ease both;">
+      <div onClick="{{ stop }}" style="width:420px;max-width:94%;background:#0e110f;border:1px solid #2a302d;border-radius:12px;box-shadow:0 24px 70px rgba(0,0,0,.6);">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:15px 18px;border-bottom:1px solid #1b201e;">
+          <span style="font-size:13px;font-weight:700;color:#eef2ef;letter-spacing:.5px;">ADD DOCUMENT</span>
+          <button onClick="{{ onCloseDocForm }}" style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;border:1px solid #2a302d;background:#161a18;border-radius:6px;color:#b3b9b4;cursor:pointer;font-size:11px;font-family:inherit;">{{ iClose }}</button>
+        </div>
+        <div style="padding:18px;display:flex;flex-direction:column;gap:12px;">
+          <div><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Datasheet PDF</label><label style="display:flex;align-items:center;justify-content:center;gap:6px;height:32px;background:#0c0f0e;border:1px dashed #313a35;border-radius:6px;cursor:pointer;color:#b3b9b4;font-size:11px;" style-hover="border-color:#3fb950;"><span style="color:#3fb950;">{{ iUpload }}</span> Attach PDF — reads page count<input type="file" accept="application/pdf,.pdf" onChange="{{ onDocPDF }}" style="display:none;"></label></div>
+          <div style="display:flex;gap:10px;">
+            <div style="flex:1;"><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">File name</label><input value="{{ docDraft.pdfName }}" readonly="" placeholder="— attach a PDF —" style="width:100%;background:#0c0f0e;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#b3b9b4;font-family:inherit;font-size:12px;cursor:not-allowed;"></div>
+            <div style="width:104px;"><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Size</label><input value="{{ docDraft.size }}" readonly="" title="read from attached PDF" style="width:100%;background:#0c0f0e;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#b3b9b4;font-family:inherit;font-size:12px;cursor:not-allowed;"></div>
+          </div>
+          <div style="display:flex;gap:10px;">
+            <div style="flex:1;"><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Model / Part no.</label><input value="{{ docDraft.code }}" onChange="{{ onDocCode }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"></div>
+            <div style="width:84px;"><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Pages</label><input type="number" value="{{ docDraft.pages }}" readonly="" title="read from attached PDF" style="width:100%;background:#0c0f0e;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#b3b9b4;font-family:inherit;font-size:12px;cursor:not-allowed;"></div>
+          </div>
+          <div><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Title</label><input value="{{ docDraft.title }}" onChange="{{ onDocTitle }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"></div>
+          <div><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Manufacturer</label><input value="{{ docDraft.manufacturer }}" onChange="{{ onDocMfr }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"></div>
+          <div style="display:flex;gap:10px;">
+            <div style="flex:1;"><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Category</label><select value="{{ docDraft.collection }}" onChange="{{ onDocCollection }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"><sc-for list="{{ collOptions }}" as="c" hint-placeholder-count="3"><option value="{{ c }}">{{ c }}</option></sc-for></select></div>
+            <div style="width:120px;"><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Status</label><select value="{{ docDraft.status }}" onChange="{{ onDocStatus }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"><option value="Approved">Approved</option><option value="Review">Review</option><option value="Draft">Draft</option><option value="Deprecated">Deprecated</option></select></div>
+          </div>
+          <div><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Tags</label>
+            <div style="position:relative;">
+              <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:#121614;border:1px solid #262c28;border-radius:6px;padding:7px 8px;max-height:96px;overflow-y:auto;">
+                <sc-for list="{{ docTagChips }}" as="t" hint-placeholder-count="2"><span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#5fd06f;background:#13211a;border:1px solid #2a4a32;border-radius:5px;padding:3px 6px 3px 9px;">#{{ t.name }}<span onClick="{{ t.onRemove }}" style="cursor:pointer;color:#6b726d;font-size:10px;">{{ iCloseSm }}</span></span></sc-for>
+                <input value="{{ docTagInput }}" onInput="{{ onDocTagInput }}" onKeyDown="{{ onDocTagKey }}" onFocus="{{ onDocTagFocus }}" onBlur="{{ onDocTagBlur }}" placeholder="+ add tag" style="flex:1;min-width:90px;background:transparent;border:none;color:#dfe4e1;font-family:inherit;font-size:12px;padding:2px;">
+              </div>
+              <sc-if value="{{ showTagSuggest }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:6;background:#141816;border:1px solid #2a302d;border-radius:6px;max-height:148px;overflow-y:auto;box-shadow:0 14px 32px rgba(0,0,0,.55);">
+                  <sc-for list="{{ docTagSuggestions }}" as="o" hint-placeholder-count="3"><button onMouseDown="{{ o.onPick }}" style="display:block;width:100%;text-align:left;background:transparent;border:none;border-bottom:1px solid #1b201e;padding:7px 11px;color:#cdd3cf;font-family:inherit;font-size:11.5px;cursor:pointer;" style-hover="background:#1d2320;color:#fff;">#{{ o.name }}</button></sc-for>
+                </div>
+              </sc-if>
+            </div>
+            <div style="font-size:9px;color:#9ea69f;margin-top:5px;">Type to filter your tags · Enter to add a new one.</div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:2px;">
+            <button onClick="{{ onAddDoc }}" style="flex:1;height:34px;background:#3fb950;border:none;border-radius:7px;color:#06210d;font-weight:700;font-size:11.5px;letter-spacing:.4px;cursor:pointer;font-family:inherit;" style-hover="background:#4fce62;">Add</button>
+            <button onClick="{{ onCloseDocForm }}" style="flex:1;height:34px;background:#161a18;border:1px solid #2a302d;border-radius:7px;color:#cdd3cf;font-weight:600;font-size:11.5px;letter-spacing:.4px;cursor:pointer;font-family:inherit;" style-hover="border-color:#39413d;">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== APP SETTINGS ===== -->
+  <sc-if value="{{ settingsOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:70;background:rgba(6,8,7,.78);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;animation:dlin .16s ease both;">
+      <div onClick="{{ stop }}" style="width:1000px;max-width:95%;height:900px;max-height:92vh;display:flex;flex-direction:column;background:#0e110f;border:1px solid #2a302d;border-radius:12px;box-shadow:0 24px 70px rgba(0,0,0,.6);">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:15px 18px;border-bottom:1px solid #1b201e;">
+          <div style="display:flex;align-items:center;gap:9px;"><span style="color:#b3b9b4;font-size:14px;">{{ iSettings }}</span><span style="font-size:13px;font-weight:700;color:#eef2ef;letter-spacing:.5px;">APP SETTINGS</span></div>
+          <button onClick="{{ onCloseSettings }}" style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;border:1px solid #2a302d;background:#161a18;border-radius:6px;color:#b3b9b4;cursor:pointer;font-size:11px;font-family:inherit;">{{ iClose }}</button>
+        </div>
+        <div style="display:flex;gap:2px;padding:0 8px;background:#0c0f0e;border-bottom:1px solid #1b201e;flex-wrap:wrap;">
+          <button onClick="{{ onStRepo }}" style="{{ stRepoStyle }}">Repository</button>
+          <button onClick="{{ onStCompany }}" style="{{ stCompanyStyle }}">Company</button>
+          <button onClick="{{ onStColl }}" style="{{ stCollStyle }}">Categories</button>
+          <button onClick="{{ onStTypes }}" style="{{ stTypesStyle }}">Types</button>
+          <button onClick="{{ onStMfrs }}" style="{{ stMfrsStyle }}">Manufacturers</button>
+          <button onClick="{{ onStTags }}" style="{{ stTagsStyle }}">Tags</button>
+        </div>
+        <div style="padding:18px;flex:1;overflow-y:auto;min-height:0;">
+          <div style="{{ stRepoDisp }}">
+            <div style="font-size:10.5px;letter-spacing:1.5px;color:#a4aba5;font-weight:600;margin:0 0 13px;">DOCUMENT REPOSITORY</div>
+            <div style="margin-bottom:15px;"><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Default category for new documents</label><select value="{{ repo.defaultColl }}" onChange="{{ onRepoDefaultColl }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;cursor:pointer;"><sc-for list="{{ collOptions }}" as="c" hint-placeholder-count="3"><option value="{{ c }}">{{ c }}</option></sc-for></select></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;background:#121614;border:1px solid #232925;border-radius:7px;padding:11px 12px;margin-bottom:8px;">
+              <div style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:11.5px;color:#dde3df;font-weight:600;">Auto-index on upload</span><span style="font-size:9.5px;color:#9ea69f;">Read page count and metadata when a datasheet is attached</span></div>
+              <button onClick="{{ onRepoAutoIndex }}" style="{{ repoAutoIndexStyle }}">{{ repoAutoIndexLabel }}</button>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;background:#121614;border:1px solid #232925;border-radius:7px;padding:11px 12px;margin-bottom:8px;">
+              <div style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:11.5px;color:#dde3df;font-weight:600;">Duplicate detection</span><span style="font-size:9.5px;color:#9ea69f;">Warn when a part number already exists in the library</span></div>
+              <button onClick="{{ onRepoDedupe }}" style="{{ repoDedupeStyle }}">{{ repoDedupeLabel }}</button>
+            </div>
+            <div style="font-size:9.5px;color:#9ea69f;line-height:1.5;margin-top:13px;border-top:1px solid #1f2421;padding-top:12px;">{{ indexLabel }} · stored on this device.</div>
+            <div style="border-top:1px solid #1f2421;padding-top:14px;margin-top:13px;display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:10.5px;letter-spacing:1.5px;color:#a4aba5;font-weight:600;">STORAGE</span>
+              <span style="font-size:9.5px;color:#9ea69f;line-height:1.5;margin:-2px 0 2px;">Where the library lives. Browse to a local path, or connect an external location to mirror it.</span>
+              <div style="background:#121614;border:1px solid #232925;border-radius:7px;padding:10px 12px;display:flex;flex-direction:column;gap:9px;">
+                <div style="display:flex;align-items:center;gap:11px;">
+                  <span style="color:#5fd06f;flex:none;">{{ iFolderOpen }}</span>
+                  <div style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0;"><span style="font-size:11.5px;color:#dde3df;font-weight:600;">Local storage</span><span style="font-size:9.5px;color:#9ea69f;">This device</span></div>
+                  <span style="flex:none;font-size:9px;letter-spacing:.5px;color:#5fd06f;background:#13211a;border:1px solid #2a4a32;border-radius:5px;padding:3px 8px;">ACTIVE</span>
+                </div>
+                <div style="display:flex;gap:8px;">
+                  <input value="{{ repo.location }}" onChange="{{ onRepoLocation }}" placeholder="/path/to/library" style="flex:1;background:#0c0f0e;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#cdd3cf;font-family:inherit;font-size:11.5px;">
+                  <button onClick="{{ onBrowseLocation }}" style="flex:none;display:flex;align-items:center;gap:6px;height:36px;padding:0 13px;background:#161a18;border:1px solid #2a302d;border-radius:6px;color:#cdd3cf;font-size:11px;font-weight:600;letter-spacing:.3px;cursor:pointer;font-family:inherit;" style-hover="border-color:#39413d;">{{ iFolderOpen }} Browse…</button>
+                  <input type="file" ref="{{ setBrowseInput }}" onChange="{{ onBrowsePicked }}" style="display:none;">
+                </div>
+              </div>
+              <sc-for list="{{ storageProviders }}" as="p" hint-placeholder-count="4">
+                <div style="display:flex;align-items:center;gap:11px;background:#121614;border:1px solid #232925;border-radius:7px;padding:10px 12px;">
+                  <span style="color:#9ea69f;flex:none;">{{ p.icon }}</span>
+                  <div style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0;"><span style="font-size:11.5px;color:#dde3df;font-weight:600;">{{ p.name }}</span><span style="font-size:9.5px;color:#9ea69f;">{{ p.statusLabel }}</span></div>
+                  <button onClick="{{ p.onToggle }}" style="{{ p.btnStyle }}">{{ p.btnLabel }}</button>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="{{ stCompanyDisp }}">
+          <div style="font-size:10.5px;letter-spacing:1.5px;color:#a4aba5;font-weight:600;margin:0 0 13px;">COMPANY</div>
+          <div style="margin-bottom:13px;"><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Company name</label><input value="{{ company.name }}" onChange="{{ subH.coName }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"></div>
+          <div style="margin-bottom:13px;"><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Street address</label><input value="{{ company.addr1 }}" onChange="{{ subH.coAddr1 }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"></div>
+          <div style="margin-bottom:13px;"><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">City, State ZIP</label><input value="{{ company.addr2 }}" onChange="{{ subH.coAddr2 }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"></div>
+          <div style="display:flex;gap:10px;margin-bottom:15px;">
+            <div style="flex:1;"><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Phone</label><input value="{{ company.phone }}" onChange="{{ subH.coPhone }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"></div>
+            <div style="flex:1;"><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Website</label><input value="{{ company.web }}" onChange="{{ subH.coWeb }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"></div>
+          </div>
+          <label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin:0 0 6px;display:block;">Company logo</label>
+          <sc-if value="{{ hasLogo }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;align-items:center;gap:12px;background:#121614;border:1px solid #262c28;border-radius:7px;padding:11px;">
+              <div style="background:#fff;border-radius:4px;padding:6px 9px;display:flex;align-items:center;justify-content:center;">{{ logoConfig }}</div>
+              <div style="display:flex;flex-direction:column;gap:6px;flex:1;">
+                <span style="font-size:10.5px;color:#b3b9b4;">Logo loaded</span>
+                <button onClick="{{ onClearLogo }}" style="align-self:flex-start;font-size:10px;color:#c4544f;background:transparent;border:1px solid #3a2422;border-radius:5px;padding:4px 9px;cursor:pointer;font-family:inherit;">remove</button>
+              </div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ noLogo }}" hint-placeholder-val="{{ true }}">
+            <label style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;background:#0c0f0e;border:1px dashed #313a35;border-radius:7px;padding:18px;cursor:pointer;" style-hover="border-color:#3fb950;">
+              <span style="font-size:18px;color:#3fb950;">{{ iUpload }}</span>
+              <span style="font-size:11px;color:#b3b9b4;">Choose logo file</span>
+              <span style="font-size:9px;color:#9ea69f;">PNG, JPG, SVG or TIFF · used on cover + footer</span>
+              <input type="file" accept="image/png,image/jpeg,image/svg+xml,image/tiff,.tif,.tiff,image/*" onChange="{{ onLogoFile }}" style="display:none;">
+            </label>
+          </sc-if>
+          <div style="font-size:9.5px;color:#9ea69f;line-height:1.5;margin-top:13px;border-top:1px solid #1f2421;padding-top:12px;">Company details apply to every submittal's cover and footer, and are saved on this device.</div>
+          </div>
+          <div style="{{ stCollDisp }}">
+            <div style="font-size:10.5px;letter-spacing:1.5px;color:#a4aba5;font-weight:600;margin:0 0 11px;">CATEGORIES</div>
+            <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:10px;">
+              <sc-for list="{{ collManagerRows }}" as="c" hint-placeholder-count="3">
+                <div style="display:flex;align-items:center;gap:7px;background:#121614;border:1px solid #232925;width:100%;box-sizing:border-box;border-radius:6px;padding:6px 9px;">
+                  <sc-if value="{{ c.editing }}" hint-placeholder-val="{{ false }}">
+                    <input value="{{ editingCollValue }}" onInput="{{ onEditCollVal }}" style="flex:1;background:#0c0f0e;border:1px solid #2a4a32;border-radius:5px;padding:4px 7px;color:#dfe4e1;font-family:inherit;font-size:11px;">
+                    <button onClick="{{ onSaveEditColl }}" style="flex:none;height:24px;padding:0 9px;background:#3fb950;border:none;border-radius:5px;color:#06210d;font-weight:700;font-size:10px;cursor:pointer;font-family:inherit;">Save</button>
+                    <button onClick="{{ onCancelEditColl }}" style="display:flex;align-items:center;justify-content:center;flex:none;width:24px;height:24px;background:#161a18;border:1px solid #2a302d;border-radius:5px;color:#b3b9b4;cursor:pointer;font-size:10px;font-family:inherit;">{{ iClose }}</button>
+                  </sc-if>
+                  <sc-if value="{{ c.notEditing }}" hint-placeholder-val="{{ true }}">
+                  <span style="flex:1;font-size:11px;color:#cdd3cf;">{{ c.name }}</span>
+                  <button onClick="{{ c.onEdit }}" title="rename" style="display:flex;align-items:center;justify-content:center;flex:none;width:24px;height:24px;background:#161a18;border:1px solid #2a302d;border-radius:5px;color:#b3b9b4;cursor:pointer;font-size:10px;font-family:inherit;">{{ iEdit }}</button>
+                  <button onClick="{{ c.onDelete }}" title="remove" style="display:flex;align-items:center;justify-content:center;flex:none;width:24px;height:24px;background:#1a1210;border:1px solid #3a2422;border-radius:5px;color:#c4544f;cursor:pointer;font-size:10px;font-family:inherit;">{{ iClose }}</button>
+                  </sc-if>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <input value="{{ collDraft }}" onInput="{{ onCollDraft }}" placeholder="New category name" style="flex:1;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;">
+              <button onClick="{{ onAddCollection }}" style="flex:none;height:34px;padding:0 14px;background:#13211a;border:1px solid #2a4a32;border-radius:7px;color:#5fd06f;font-weight:700;font-size:11px;cursor:pointer;font-family:inherit;">Add</button>
+            </div>
+          </div>
+          <div style="{{ stTypesDisp }}">
+            <div style="font-size:10.5px;letter-spacing:1.5px;color:#a4aba5;font-weight:600;margin:0 0 11px;">DOCUMENT TYPES</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;">
+              <sc-for list="{{ typeManagerRows }}" as="t" hint-placeholder-count="3"><span style="display:flex;align-items:center;gap:6px;font-size:11px;color:#cdd3cf;background:#121614;border:1px solid #232925;border-radius:5px;padding:4px 8px;">{{ t.name }}<span onClick="{{ t.onDelete }}" style="cursor:pointer;color:#c4544f;font-size:10px;">{{ iCloseSm }}</span></span></sc-for>
+            </div>
+            <div style="display:flex;gap:8px;"><input value="{{ libDraft.types }}" onInput="{{ onTypeDraft }}" placeholder="New document type" style="flex:1;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"><button onClick="{{ onAddType }}" style="flex:none;height:34px;padding:0 14px;background:#13211a;border:1px solid #2a4a32;border-radius:7px;color:#5fd06f;font-weight:700;font-size:11px;cursor:pointer;font-family:inherit;">Add</button></div>
+          </div>
+          <div style="{{ stMfrsDisp }}">
+            <div style="font-size:10.5px;letter-spacing:1.5px;color:#a4aba5;font-weight:600;margin:0 0 11px;">MANUFACTURERS</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;">
+              <sc-for list="{{ mfrManagerRows }}" as="m" hint-placeholder-count="3"><span style="display:flex;align-items:center;gap:6px;font-size:11px;color:#cdd3cf;background:#121614;border:1px solid #232925;border-radius:5px;padding:4px 8px;">{{ m.name }}<span onClick="{{ m.onDelete }}" style="cursor:pointer;color:#c4544f;font-size:10px;">{{ iCloseSm }}</span></span></sc-for>
+            </div>
+            <div style="display:flex;gap:8px;"><input value="{{ libDraft.mfrs }}" onInput="{{ onMfrDraft }}" placeholder="New manufacturer" style="flex:1;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"><button onClick="{{ onAddMfr }}" style="flex:none;height:34px;padding:0 14px;background:#13211a;border:1px solid #2a4a32;border-radius:7px;color:#5fd06f;font-weight:700;font-size:11px;cursor:pointer;font-family:inherit;">Add</button></div>
+          </div>
+          <div style="{{ stTagsDisp }}">
+            <div style="font-size:10.5px;letter-spacing:1.5px;color:#a4aba5;font-weight:600;margin:0 0 11px;">TAGS</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;">
+              <sc-for list="{{ tagManagerRows }}" as="t" hint-placeholder-count="3"><span style="display:flex;align-items:center;gap:6px;font-size:11px;color:#b2b8b3;background:#121614;border:1px solid #232925;border-radius:5px;padding:4px 8px;">#{{ t.name }}<span onClick="{{ t.onDelete }}" style="cursor:pointer;color:#c4544f;font-size:10px;">{{ iCloseSm }}</span></span></sc-for>
+            </div>
+            <div style="display:flex;gap:8px;"><input value="{{ libDraft.tags }}" onInput="{{ onTagLibDraft }}" placeholder="New tag" style="flex:1;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"><button onClick="{{ onAddTagLib }}" style="flex:none;height:34px;padding:0 14px;background:#13211a;border:1px solid #2a4a32;border-radius:7px;color:#5fd06f;font-weight:700;font-size:11px;cursor:pointer;font-family:inherit;">Add</button></div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:14px 18px;border-top:1px solid #1b201e;">
+          <button onClick="{{ onSaveSettings }}" style="flex:none;height:34px;padding:0 20px;background:#3fb950;border:none;border-radius:7px;color:#06210d;font-weight:700;font-size:11.5px;letter-spacing:.4px;cursor:pointer;font-family:inherit;" style-hover="background:#4fce62;">{{ settingsSaveLabel }}</button>
+          <button onClick="{{ onCloseSettings }}" style="flex:none;height:34px;padding:0 18px;background:#161a18;border:1px solid #2a302d;border-radius:7px;color:#cdd3cf;font-weight:600;font-size:11.5px;letter-spacing:.4px;cursor:pointer;font-family:inherit;" style-hover="border-color:#39413d;">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== CHANGE PASSWORD ===== -->
+  <!-- ===== DOWNLOAD ===== -->
+  <sc-if value="{{ downloadOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ onCloseDownload }}" style="position:fixed;inset:0;z-index:87;background:rgba(6,8,7,.6);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;animation:dlin .14s ease both;">
+      <div onClick="{{ stop }}" style="width:400px;max-width:92%;background:#0e110f;border:1px solid #2a302d;border-radius:12px;box-shadow:0 24px 70px rgba(0,0,0,.6);">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:15px 18px;border-bottom:1px solid #1b201e;">
+          <span style="font-size:13px;font-weight:700;color:#eef2ef;letter-spacing:.4px;">Download</span>
+          <button onClick="{{ onCloseDownload }}" style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;border:1px solid #2a302d;background:#161a18;border-radius:6px;color:#b3b9b4;cursor:pointer;font-family:inherit;">{{ iClose }}</button>
+        </div>
+        <div style="padding:18px;display:flex;flex-direction:column;gap:13px;">
+          <div style="display:flex;align-items:center;gap:11px;background:#121614;border:1px solid #232925;border-radius:7px;padding:10px 12px;">
+            <span style="color:#5fae6a;flex:none;">{{ iDownload }}</span>
+            <div style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0;"><span style="font-size:11.5px;color:#dde3df;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ downloadFileName }}</span><span style="font-size:9.5px;color:#9ea69f;">{{ downloadSize }} · PDF</span></div>
+          </div>
+          <div><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Format</label><select value="{{ downloadFormat }}" onChange="{{ onDownloadFormat }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;cursor:pointer;"><option value="pdf">PDF — original</option><option value="pdfa">PDF/A — archival</option><option value="combined">Combined PDF (with cover)</option></select></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;background:#121614;border:1px solid #232925;border-radius:7px;padding:11px 12px;">
+            <div style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:11.5px;color:#dde3df;font-weight:600;">Include cover page</span><span style="font-size:9.5px;color:#9ea69f;">Prepend the company cover sheet</span></div>
+            <button onClick="{{ onToggleDownloadCover }}" style="{{ downloadCoverStyle }}">{{ downloadCoverLabel }}</button>
+          </div>
+          <div style="border-top:1px solid #1f2421;padding-top:13px;display:flex;flex-direction:column;gap:8px;">
+            <span style="font-size:10.5px;letter-spacing:1.5px;color:#a4aba5;font-weight:600;">PDF PROTECTION</span>
+            <div style="display:flex;align-items:center;justify-content:space-between;background:#121614;border:1px solid #232925;border-radius:7px;padding:11px 12px;">
+              <div style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:11.5px;color:#dde3df;font-weight:600;">Password protection</span><span style="font-size:9.5px;color:#9ea69f;">Require a password to open the PDF</span></div>
+              <button onClick="{{ onToggleDownloadProtect }}" style="{{ downloadProtectStyle }}">{{ downloadProtectLabel }}</button>
+            </div>
+            <sc-if value="{{ downloadProtect }}" hint-placeholder-val="{{ false }}">
+              <input type="password" value="{{ downloadPassword }}" onInput="{{ onDownloadPassword }}" placeholder="Document password" style="width:100%;box-sizing:border-box;background:#0c0f0e;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;background:#121614;border:1px solid #232925;border-radius:7px;padding:9px 12px;">
+                <span style="font-size:11px;color:#cdd3df;">Allow printing</span>
+                <button onClick="{{ onToggleAllowPrint }}" style="{{ downloadAllowPrintStyle }}">{{ downloadAllowPrintLabel }}</button>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;background:#121614;border:1px solid #232925;border-radius:7px;padding:9px 12px;">
+                <span style="font-size:11px;color:#cdd3df;">Allow copying text</span>
+                <button onClick="{{ onToggleAllowCopy }}" style="{{ downloadAllowCopyStyle }}">{{ downloadAllowCopyLabel }}</button>
+              </div>
+            </sc-if>
+          </div>
+          <sc-if value="{{ downloadError }}" hint-placeholder-val="{{ false }}"><div style="font-size:10.5px;color:#c4544f;background:#1a1210;border:1px solid #3a2422;border-radius:6px;padding:8px 10px;">{{ downloadError }}</div></sc-if>
+          <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:2px;">
+            <button onClick="{{ onDoDownload }}" style="flex:none;display:flex;align-items:center;gap:7px;height:34px;padding:0 18px;background:#3fb950;border:none;border-radius:7px;color:#06210d;font-weight:700;font-size:11.5px;letter-spacing:.4px;cursor:pointer;font-family:inherit;" style-hover="background:#4fce62;">{{ iDownload }} {{ downloadBtnLabel }}</button>
+            <button onClick="{{ onCloseDownload }}" style="flex:none;height:34px;padding:0 16px;background:#161a18;border:1px solid #2a302d;border-radius:7px;color:#cdd3cf;font-weight:600;font-size:11.5px;letter-spacing:.4px;cursor:pointer;font-family:inherit;" style-hover="border-color:#39413d;">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== SHARE ===== -->
+  <sc-if value="{{ shareOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ onCloseShare }}" style="position:fixed;inset:0;z-index:86;background:rgba(6,8,7,.6);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;animation:dlin .14s ease both;">
+      <div onClick="{{ stop }}" style="width:410px;max-width:92%;background:#0e110f;border:1px solid #2a302d;border-radius:12px;box-shadow:0 24px 70px rgba(0,0,0,.6);">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:15px 18px;border-bottom:1px solid #1b201e;">
+          <span style="font-size:13px;font-weight:700;color:#eef2ef;letter-spacing:.4px;">Share · {{ shareDocLabel }}</span>
+          <button onClick="{{ onCloseShare }}" style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;border:1px solid #2a302d;background:#161a18;border-radius:6px;color:#b3b9b4;cursor:pointer;font-family:inherit;">{{ iClose }}</button>
+        </div>
+        <div style="padding:18px;display:flex;flex-direction:column;gap:12px;">
+          <div style="display:flex;gap:3px;background:#0c0f0e;border:1px solid #232925;border-radius:8px;padding:3px;">
+            <button onClick="{{ onShareUser }}" style="{{ shareUserStyle }}">User</button>
+            <button onClick="{{ onShareEmail }}" style="{{ shareEmailStyle }}">Email</button>
+          </div>
+          <sc-if value="{{ shareIsUser }}" hint-placeholder-val="{{ true }}">
+            <div><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Recipient</label><select value="{{ shareRecipient }}" onChange="{{ onShareRecipient }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;cursor:pointer;"><option value="">Select User…</option><sc-for list="{{ shareUsers }}" as="u" hint-placeholder-count="4"><option value="{{ u }}">{{ u }}</option></sc-for></select></div>
+          </sc-if>
+          <sc-if value="{{ shareIsEmail }}" hint-placeholder-val="{{ false }}">
+            <div><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Email address</label><input type="email" value="{{ shareRecipient }}" onInput="{{ onShareRecipient }}" placeholder="name@company.com" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"></div>
+          </sc-if>
+          <div><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Permission</label><select value="{{ sharePermission }}" onChange="{{ onSharePermission }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;cursor:pointer;"><option value="view">Can view</option><option value="edit">Can edit</option></select></div>
+          <div><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Message (optional)</label><textarea value="{{ shareMsg }}" onInput="{{ onShareMsg }}" placeholder="Add a note…" style="width:100%;height:64px;resize:vertical;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;line-height:1.5;"></textarea></div>
+          <sc-if value="{{ shareError }}" hint-placeholder-val="{{ false }}"><div style="font-size:10.5px;color:#c4544f;background:#1a1210;border:1px solid #3a2422;border-radius:6px;padding:8px 10px;">{{ shareError }}</div></sc-if>
+          <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:2px;">
+            <button onClick="{{ onSubmitShare }}" style="flex:none;height:34px;padding:0 18px;background:#3fb950;border:none;border-radius:7px;color:#06210d;font-weight:700;font-size:11.5px;letter-spacing:.4px;cursor:pointer;font-family:inherit;" style-hover="background:#4fce62;">{{ shareSendLabel }}</button>
+            <button onClick="{{ onCloseShare }}" style="flex:none;height:34px;padding:0 16px;background:#161a18;border:1px solid #2a302d;border-radius:7px;color:#cdd3cf;font-weight:600;font-size:11.5px;letter-spacing:.4px;cursor:pointer;font-family:inherit;" style-hover="border-color:#39413d;">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== CONNECT EXTERNAL STORAGE ===== -->
+  <sc-if value="{{ connectOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ onCloseConnect }}" style="position:fixed;inset:0;z-index:84;background:rgba(6,8,7,.6);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;animation:dlin .14s ease both;">
+      <div onClick="{{ stop }}" style="width:400px;max-width:92%;background:#0e110f;border:1px solid #2a302d;border-radius:12px;box-shadow:0 24px 70px rgba(0,0,0,.6);">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:15px 18px;border-bottom:1px solid #1b201e;">
+          <span style="font-size:13px;font-weight:700;color:#eef2ef;letter-spacing:.4px;">{{ connectTitle }}</span>
+          <button onClick="{{ onCloseConnect }}" style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;border:1px solid #2a302d;background:#161a18;border-radius:6px;color:#b3b9b4;cursor:pointer;font-family:inherit;">{{ iClose }}</button>
+        </div>
+        <div style="padding:18px;display:flex;flex-direction:column;gap:12px;">
+          <sc-for list="{{ connectFields }}" as="f" hint-placeholder-count="3">
+            <div><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">{{ f.label }}</label><input type="{{ f.inputType }}" value="{{ f.value }}" onInput="{{ f.onInput }}" placeholder="{{ f.placeholder }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"></div>
+          </sc-for>
+          <sc-if value="{{ connectError }}" hint-placeholder-val="{{ false }}"><div style="font-size:10.5px;color:#c4544f;background:#1a1210;border:1px solid #3a2422;border-radius:6px;padding:8px 10px;">{{ connectError }}</div></sc-if>
+          <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:2px;">
+            <button onClick="{{ onSubmitConnect }}" style="flex:none;height:34px;padding:0 18px;background:#3fb950;border:none;border-radius:7px;color:#06210d;font-weight:700;font-size:11.5px;letter-spacing:.4px;cursor:pointer;font-family:inherit;" style-hover="background:#4fce62;">Connect</button>
+            <button onClick="{{ onCloseConnect }}" style="flex:none;height:34px;padding:0 16px;background:#161a18;border:1px solid #2a302d;border-radius:7px;color:#cdd3cf;font-weight:600;font-size:11.5px;letter-spacing:.4px;cursor:pointer;font-family:inherit;" style-hover="border-color:#39413d;">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== FOLDER PICKER ===== -->
+  <sc-if value="{{ browseOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ onCloseBrowse }}" style="position:fixed;inset:0;z-index:82;background:rgba(6,8,7,.6);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;animation:dlin .14s ease both;">
+      <div onClick="{{ stop }}" style="width:440px;max-width:92%;background:#0e110f;border:1px solid #2a302d;border-radius:12px;box-shadow:0 24px 70px rgba(0,0,0,.6);display:flex;flex-direction:column;max-height:80vh;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:15px 18px;border-bottom:1px solid #1b201e;">
+          <span style="font-size:13px;font-weight:700;color:#eef2ef;letter-spacing:.5px;">SELECT FOLDER</span>
+          <button onClick="{{ onCloseBrowse }}" style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;border:1px solid #2a302d;background:#161a18;border-radius:6px;color:#b3b9b4;cursor:pointer;font-family:inherit;">{{ iClose }}</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:9px;padding:11px 18px;border-bottom:1px solid #1b201e;">
+          <sc-if value="{{ browseCanUp }}" hint-placeholder-val="{{ true }}">
+            <button onClick="{{ onBrowseUp }}" title="up one level" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border:1px solid #2a302d;background:#161a18;border-radius:6px;color:#cdd3cf;cursor:pointer;font-family:inherit;">{{ iPrev }}</button>
+          </sc-if>
+          <span style="flex:1;font-size:11.5px;color:#cdd3cf;font-family:inherit;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ browsePath }}</span>
+        </div>
+        <div class="scry" style="flex:1;overflow-y:auto;min-height:0;padding:8px;display:flex;flex-direction:column;gap:2px;">
+          <sc-for list="{{ browseFolders }}" as="f" hint-placeholder-count="3">
+            <button onClick="{{ f.onOpen }}" style="display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:transparent;border:none;border-radius:6px;padding:9px 11px;color:#dde3df;font-family:inherit;font-size:12px;cursor:pointer;" style-hover="background:#1a1e1c;"><span style="color:#5fd06f;">{{ iFolderRow }}</span><span style="flex:1;">{{ f.name }}</span><span style="color:#7c847e;">{{ iChevRow }}</span></button>
+          </sc-for>
+          <sc-if value="{{ browseEmpty }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:18px 11px;font-size:11px;color:#9ea69f;text-align:center;">No subfolders here.</div>
+          </sc-if>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:8px;padding:14px 18px;border-top:1px solid #1b201e;">
+          <button onClick="{{ onBrowseSelect }}" style="flex:none;height:34px;padding:0 18px;background:#3fb950;border:none;border-radius:7px;color:#06210d;font-weight:700;font-size:11.5px;letter-spacing:.4px;cursor:pointer;font-family:inherit;" style-hover="background:#4fce62;">Select this folder</button>
+          <button onClick="{{ onCloseBrowse }}" style="flex:none;height:34px;padding:0 16px;background:#161a18;border:1px solid #2a302d;border-radius:7px;color:#cdd3cf;font-weight:600;font-size:11.5px;letter-spacing:.4px;cursor:pointer;font-family:inherit;" style-hover="border-color:#39413d;">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ pwOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:80;background:rgba(6,8,7,.6);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;animation:dlin .14s ease both;">
+      <div onClick="{{ stop }}" style="width:380px;max-width:92%;background:#0e110f;border:1px solid #2a302d;border-radius:12px;box-shadow:0 24px 70px rgba(0,0,0,.6);">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:15px 18px;border-bottom:1px solid #1b201e;">
+          <span style="font-size:13px;font-weight:700;color:#eef2ef;letter-spacing:.5px;">CHANGE PASSWORD</span>
+          <button onClick="{{ onClosePw }}" style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;border:1px solid #2a302d;background:#161a18;border-radius:6px;color:#b3b9b4;cursor:pointer;font-family:inherit;">{{ iClose }}</button>
+        </div>
+        <div style="padding:18px;display:flex;flex-direction:column;gap:12px;">
+          <div><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Current password</label><input type="password" value="{{ pw.current }}" onInput="{{ onPwCurrent }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"></div>
+          <div><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">New password</label><input type="password" value="{{ pw.next }}" onInput="{{ onPwNext }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"></div>
+          <div><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Confirm new password</label><input type="password" value="{{ pw.confirm }}" onInput="{{ onPwConfirm }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"></div>
+          <sc-if value="{{ pwError }}" hint-placeholder-val="{{ false }}"><div style="font-size:10.5px;color:#c4544f;background:#1a1210;border:1px solid #3a2422;border-radius:6px;padding:8px 10px;">{{ pwError }}</div></sc-if>
+          <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:2px;">
+            <button onClick="{{ onSubmitPw }}" style="flex:none;height:34px;padding:0 18px;background:#3fb950;border:none;border-radius:7px;color:#06210d;font-weight:700;font-size:11.5px;letter-spacing:.4px;cursor:pointer;font-family:inherit;" style-hover="background:#4fce62;">Update password</button>
+            <button onClick="{{ onClosePw }}" style="flex:none;height:34px;padding:0 16px;background:#161a18;border:1px solid #2a302d;border-radius:7px;color:#cdd3cf;font-weight:600;font-size:11.5px;letter-spacing:.4px;cursor:pointer;font-family:inherit;" style-hover="border-color:#39413d;">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== ACCOUNT SETTINGS ===== -->
+  <sc-if value="{{ accountModalOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:72;background:rgba(6,8,7,.78);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;animation:dlin .16s ease both;">
+      <div onClick="{{ stop }}" style="width: 1000px; max-width: 95%; height: 900px; max-height: 92vh; display: flex; flex-direction: column; background: #0e110f; border: 1px solid #2a302d; border-radius: 12px; box-shadow: 0 24px 70px rgba(0,0,0,.6)">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:15px 18px;border-bottom:1px solid #1b201e;">
+          <span style="font-size:13px;font-weight:700;color:#eef2ef;letter-spacing:.5px;">ACCOUNT</span>
+          <button onClick="{{ onCloseAccountModal }}" style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;border:1px solid #2a302d;background:#161a18;border-radius:6px;color:#b3b9b4;cursor:pointer;font-family:inherit;">{{ iClose }}</button>
+        </div>
+        <div style="display:flex;gap:2px;padding:0 14px;background:#0c0f0e;border-bottom:1px solid #1b201e;">
+          <button onClick="{{ onAccTabProfile }}" style="{{ accTabProfileStyle }}">Profile</button>
+          <button onClick="{{ onAccTabTypes }}" style="{{ accTabTypesStyle }}">Account types</button>
+        </div>
+        <div style="flex:1;padding:18px;overflow-y:auto;min-height:0;">
+          <div style="{{ accProfileDisp }}">
+          <div style="display:flex;align-items:center;gap:15px;">
+            <div style="width:58px;height:58px;border-radius:50%;background:{{ accountAvatarBg }};display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:700;color:#06210d;flex:none;">{{ accountInitials }}</div>
+            <div style="display:flex;flex-direction:column;gap:7px;">
+              <span style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;">Avatar color</span>
+              <div style="display:flex;gap:9px;"><sc-for list="{{ accountColorOptions }}" as="o" hint-placeholder-count="5"><button onClick="{{ o.onPick }}" style="{{ o.style }}"></button></sc-for></div>
+            </div>
+            <div style="flex:1;"></div>
+            <button onClick="{{ onSignOut }}" style="flex:none;align-self:flex-start;display:flex;align-items:center;gap:7px;height:32px;padding:0 14px;background:#1a1210;border:1px solid #3a2422;border-radius:7px;color:#c4544f;font-weight:600;font-size:11.5px;letter-spacing:.3px;cursor:pointer;font-family:inherit;" style-hover="border-color:#5a3430;">{{ iSignOut }} Sign out</button>
+          </div>
+          <div><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Full name</label><input value="{{ account.name }}" onChange="{{ onAccName }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"></div>
+          <div><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Email</label><input value="{{ account.email }}" onChange="{{ onAccEmail }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"></div>
+          <div style="display:flex;gap:10px;">
+            <div style="flex:1;"><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Role / title</label><input value="{{ account.role }}" onChange="{{ onAccRole }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"></div>
+            <div style="flex:1;"><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Phone</label><input value="{{ account.phone }}" onChange="{{ onAccPhone }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"></div>
+          </div>
+          <div><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Account role</label><select value="{{ accountRole }}" onChange="{{ onAccRoleType }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;cursor:pointer;"><sc-for list="{{ accountTypeNames }}" as="n" hint-placeholder-count="4"><option value="{{ n }}">{{ n }}</option></sc-for></select></div>
+          <div style="border-top:1px solid #1f2421;padding-top:14px;display:flex;flex-direction:column;gap:8px;">
+            <span style="font-size:10.5px;letter-spacing:1.5px;color:#a4aba5;font-weight:600;">SECURITY</span>
+            <div style="display:flex;align-items:center;justify-content:space-between;background:#121614;border:1px solid #232925;border-radius:7px;padding:11px 12px;">
+              <div style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:11.5px;color:#dde3df;font-weight:600;">Password</span><span style="font-size:9.5px;color:#9ea69f;">{{ pwSubtitle }}</span></div>
+              <button onClick="{{ onOpenPw }}" style="flex:none;height:28px;padding:0 12px;background:#161a18;border:1px solid #2a302d;border-radius:6px;color:#cdd3cf;font-weight:600;font-size:10.5px;letter-spacing:.3px;cursor:pointer;font-family:inherit;" style-hover="border-color:#39413d;">Change</button>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;background:#121614;border:1px solid #232925;border-radius:7px;padding:11px 12px;">
+              <div style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:11.5px;color:#dde3df;font-weight:600;">Two-factor authentication</span><span style="font-size:9.5px;color:#9ea69f;">Require a verification code at sign-in</span></div>
+              <button onClick="{{ onAccTwoFactor }}" style="{{ accTwoFactorStyle }}">{{ accTwoFactorLabel }}</button>
+            </div>
+          </div>
+          </div>
+          <div style="{{ accTypesDisp }}">
+            <span style="font-size:10.5px;letter-spacing:1.5px;color:#a4aba5;font-weight:600;">ACCOUNT TYPES</span>
+            <span style="font-size:9.5px;color:#9ea69f;line-height:1.5;margin:-2px 0 2px;">Define the access level granted to each account type.</span>
+            <sc-for list="{{ accountTypeRows }}" as="t" hint-placeholder-count="4">
+              <div style="display:flex;align-items:center;gap:9px;background:#121614;border:1px solid #232925;border-radius:7px;padding:8px 10px;">
+                <span style="flex:1;font-size:11.5px;color:#dde3df;font-weight:600;">{{ t.name }}</span>
+                <select value="{{ t.access }}" onChange="{{ t.onAccess }}" style="flex:none;width:152px;background:#0c0f0e;border:1px solid #2a302d;border-radius:6px;padding:6px 8px;color:#cdd3cf;font-family:inherit;font-size:11px;cursor:pointer;"><sc-for list="{{ accessOptions }}" as="a" hint-placeholder-count="4"><option value="{{ a }}">{{ a }}</option></sc-for></select>
+                <button onClick="{{ t.onRemove }}" title="remove" style="flex:none;display:flex;align-items:center;justify-content:center;width:24px;height:24px;background:#1a1210;border:1px solid #3a2422;border-radius:5px;color:#c4544f;cursor:pointer;font-family:inherit;">{{ iCloseSm }}</button>
+              </div>
+            </sc-for>
+            <div style="display:flex;gap:8px;">
+              <input value="{{ accountTypeDraft }}" onInput="{{ onAccountTypeDraft }}" placeholder="New account type" style="flex:1;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;">
+              <button onClick="{{ onAddAccountType }}" style="flex:none;height:34px;padding:0 14px;background:#13211a;border:1px solid #2a4a32;border-radius:7px;color:#5fd06f;font-weight:700;font-size:11px;cursor:pointer;font-family:inherit;">Add</button>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:14px 18px;border-top:1px solid #1b201e;">
+          <div style="flex:1;"></div>
+          <div style="flex:1;"></div>
+          <button onClick="{{ onCloseAccountModal }}" style="flex:none;height:34px;padding:0 18px;background:#3fb950;border:none;border-radius:7px;color:#06210d;font-weight:700;font-size:11.5px;letter-spacing:.4px;cursor:pointer;font-family:inherit;" style-hover="background:#4fce62;">Done</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== FULL-SIZE PDF VIEWER ===== -->
+  <sc-if value="{{ viewerOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ onCloseViewer }}" style="position:fixed;inset:0;z-index:50;background:rgba(6,8,7,.82);backdrop-filter:blur(3px);display:flex;flex-direction:column;animation:dlin .18s ease both;">
+      <!-- viewer toolbar -->
+      <div onClick="{{ stop }}" style="flex:none;display:flex;align-items:center;justify-content:space-between;padding:11px 18px;background:#0e110f;border-bottom:1px solid #20251f;">
+        <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+          <span style="font-size:10px;color:#5fae6a;letter-spacing:.5px;font-weight:600;flex:none;">{{ selected.code }}</span>
+          <span style="font-size:12.5px;color:#dde3df;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ selected.title }}</span>
+          <span style="{{ selected.statusStyle }}">{{ selected.statusLabel }}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;flex:none;">
+          <div style="display:flex;border:1px solid #262c28;border-radius:6px;overflow:hidden;">
+            <button onClick="{{ onScrollPages }}" title="scroll pages" style="{{ scrollStyle }}">SCROLL</button>
+            <button onClick="{{ onSinglePage }}" title="one page" style="{{ singleStyle }}">1 PAGE</button>
+          </div>
+          <button onClick="{{ onOpenFindViewer }}" title="find (Ctrl+F)" style="display:flex;align-items:center;gap:6px;height:30px;padding:0 11px;border:1px solid #262c28;background:#121614;border-radius:6px;color:#cdd3cf;cursor:pointer;font-size:11px;letter-spacing:.3px;font-family:inherit;" style-hover="border-color:#39413d;">{{ iSearch }} FIND</button>
+          <div style="display:flex;align-items:center;gap:2px;border:1px solid #262c28;border-radius:6px;overflow:hidden;">
+            <button onClick="{{ onVZoomOut }}" title="zoom out" style="display:flex;align-items:center;justify-content:center;width:28px;height:30px;background:#121614;border:none;color:#b3b9b4;cursor:pointer;font-size:15px;font-family:inherit;" style-hover="background:#1a1e1c;color:#cdd3cf;">{{ iMinus }}</button>
+            <button onClick="{{ onVZoomReset }}" title="reset zoom" style="min-width:46px;height:30px;background:#121614;border:none;border-left:1px solid #262c28;border-right:1px solid #262c28;color:#cdd3cf;cursor:pointer;font-size:11px;font-family:inherit;" style-hover="background:#1a1e1c;">{{ viewerZoomPct }}</button>
+            <button onClick="{{ onVZoomIn }}" title="zoom in" style="display:flex;align-items:center;justify-content:center;width:28px;height:30px;background:#121614;border:none;color:#b3b9b4;cursor:pointer;font-size:15px;font-family:inherit;" style-hover="background:#1a1e1c;color:#cdd3cf;">{{ iPlus }}</button>
+          </div>
+          <span style="width:1px;height:18px;background:#2a302d;"></span>
+          <button onClick="{{ onOpenDesktop }}" style="display:flex;align-items:center;gap:7px;height:30px;padding:0 12px;border:1px solid #262c28;background:#121614;border-radius:6px;color:#cdd3cf;cursor:pointer;font-size:11px;letter-spacing:.3px;font-family:inherit;" style-hover="border-color:#39413d;"><span style="color:#3fb950;">{{ iExternal }}</span> DESKTOP APP</button>
+          <button onClick="{{ onDownload }}" title="download" style="display:flex;align-items:center;justify-content:center;width:30px;height:30px;border:1px solid #262c28;background:#121614;border-radius:6px;color:#b3b9b4;cursor:pointer;font-size:13px;font-family:inherit;" style-hover="border-color:#39413d;color:#cdd3cf;">{{ iDownload }}</button>
+          <button onClick="{{ onCloseViewer }}" style="display:flex;align-items:center;gap:7px;height:30px;padding:0 13px;background:#1a1e1c;border:1px solid #2a302d;border-radius:6px;color:#cdd3cf;font-weight:600;font-size:11px;letter-spacing:.4px;cursor:pointer;font-family:inherit;" style-hover="border-color:#39413d;">ESC · CLOSE {{ iClose }}</button>
+        </div>
+      </div>
+      <!-- find bar -->
+      <sc-if value="{{ findOpenViewer }}" hint-placeholder-val="{{ false }}">
+        <div onClick="{{ stop }}" style="position:absolute;top:60px;right:22px;z-index:8;display:flex;align-items:center;gap:8px;background:#0e110f;border:1px solid #2a302d;border-radius:9px;padding:6px 8px;box-shadow:0 12px 32px rgba(0,0,0,.55);">
+          
+          <input id="findInput" value="{{ findQuery }}" onInput="{{ onFindInput }}" placeholder="find in document" style="width:170px;background:transparent;border:none;color:#dfe4e1;font-family:inherit;font-size:12px;">
+          <span style="font-size:10.5px;color:#b2b8b3;min-width:46px;text-align:right;">{{ findStat }}</span>
+          <button onClick="{{ onFindPrev }}" title="previous match" style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;border:1px solid #2a302d;background:#161a18;border-radius:6px;color:#b3b9b4;cursor:pointer;font-size:13px;font-family:inherit;" style-hover="border-color:#39413d;color:#cdd3cf;">{{ iPrev }}</button>
+          <button onClick="{{ onFindNext }}" title="next match" style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;border:1px solid #2a302d;background:#161a18;border-radius:6px;color:#b3b9b4;cursor:pointer;font-size:13px;font-family:inherit;" style-hover="border-color:#39413d;color:#cdd3cf;">{{ iNext }}</button>
+          <button onClick="{{ onCloseFind }}" title="close" style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;border:1px solid #2a302d;background:#161a18;border-radius:6px;color:#b3b9b4;cursor:pointer;font-size:11px;font-family:inherit;" style-hover="border-color:#39413d;color:#cdd3cf;">{{ iClose }}</button>
+        </div>
+      </sc-if>
+      <!-- scrollable page stage -->
+      <div id="dsViewer" ref="{{ setViewerRef }}" onClick="{{ onCloseViewer }}" class="scry" style="flex:1;overflow-y:auto;min-height:0;position:relative;display:flex;flex-direction:column;align-items:center;gap:20px;padding:32px 24px 80px;zoom: {{ viewerZoom }};">
+        <sc-for list="{{ viewerPages }}" as="vp" hint-placeholder-count="2">
+          <div class="dspage" onClick="{{ stop }}" style="flex:none;width:720px;max-width:94%;background:#f3f3ee;border-radius:3px;box-shadow:0 24px 70px rgba(0,0,0,.6);color:#1b1b18;overflow:hidden;">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 40px;border-bottom:1px solid #d8d8d1;color:#7a7a70;letter-spacing:.6px;font-size:10px;">
+              <span>{{ selected.code }} · REV {{ selected.version }}</span>
+              <span style="color:#a83a32;font-weight:700;">CONFIDENTIAL · INTERNAL USE ONLY</span>
+            </div>
+            <sc-if value="{{ vp.hasPdf }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:0;background:#fff;">{{ vp.canvas }}</div>
+            </sc-if>
+            <sc-if value="{{ vp.firstNoPdf }}" hint-placeholder-val="{{ true }}">
+              <div style="padding:56px 64px 60px;">
+                <div style="font-size:11px;letter-spacing:2.5px;color:#8a8a80;margin-bottom:14px;">{{ selected.collection }} · {{ selected.kind }}</div>
+                <div style="font-size:30px;font-weight:700;line-height:1.2;color:#141411;margin-bottom:14px;letter-spacing:-.3px;">{{ selected.title }}</div>
+                <div style="display:flex;gap:30px;font-size:11px;color:#6a6a62;margin-bottom:34px;border-bottom:1px solid #dadad3;padding-bottom:20px;">
+                  <span>{{ selected.author }}</span><span>{{ selected.date }}</span><span>{{ selected.size }}</span><span>{{ selected.pages }} pp</span>
+                </div>
+                <div style="font-size:14px;font-weight:700;color:#26261f;margin-bottom:13px;letter-spacing:.5px;">1.&nbsp;&nbsp;SCOPE</div>
+                <div style="font-size:12px;line-height:1.85;color:#3a3a33;margin-bottom:30px;">{{ selected.abstract }}</div>
+                <div style="font-size:14px;font-weight:700;color:#26261f;margin-bottom:14px;letter-spacing:.5px;">2.&nbsp;&nbsp;REFERENCE ARCHITECTURE</div>
+                <div style="border:1px solid #cdcdc4;border-radius:3px;height:300px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;background:repeating-linear-gradient(45deg,#e4e4dc,#e4e4dc 11px,#ededdf 11px,#ededdf 22px);">
+                  <span style="font-size:11px;letter-spacing:1.5px;color:#8a8a80;background:#f3f3ee;padding:6px 14px;border-radius:3px;border:1px solid #dcdcd3;">FIG. 1 — system block diagram</span>
+                </div>
+                <div style="text-align:center;font-size:10px;color:#9a9a90;margin-bottom:32px;">drop rendered page / figure here</div>
+                <div style="display:flex;flex-direction:column;gap:9px;">
+                  <div style="height:8px;background:#dcdcd4;border-radius:2px;width:100%;"></div>
+                  <div style="height:8px;background:#dcdcd4;border-radius:2px;width:97%;"></div>
+                  <div style="height:8px;background:#dcdcd4;border-radius:2px;width:91%;"></div>
+                  <div style="height:8px;background:#dcdcd4;border-radius:2px;width:54%;"></div>
+                </div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ vp.notFirstNoPdf }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:48px 64px;display:flex;flex-direction:column;gap:14px;">
+                <div style="border:1px solid #cdcdc4;border-radius:3px;height:560px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:repeating-linear-gradient(45deg,#e4e4dc,#e4e4dc 11px,#ededdf 11px,#ededdf 22px);">
+                  <span style="font-size:11px;letter-spacing:1.5px;color:#8a8a80;background:#f3f3ee;padding:6px 14px;border-radius:3px;border:1px solid #dcdcd3;">{{ vp.footer }}</span>
+                  <span style="font-size:10px;color:#a0a096;">drop manufacturer datasheet page here</span>
+                </div>
+              </div>
+            </sc-if>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 40px;border-top:1px solid #d8d8d1;color:#9a9a90;font-size:10px;letter-spacing:.5px;">
+              <span>{{ selected.code }}</span>
+              <span>{{ vp.footer }}</span>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <!-- floating page navigation -->
+      <div onClick="{{ stop }}" style="position:absolute;left:50%;bottom:18px;transform:translateX(-50%);z-index:8;display:flex;align-items:center;gap:9px;background:rgba(13,16,14,.93);backdrop-filter:blur(7px);border:1px solid #2a302d;border-radius:11px;padding:7px 11px;box-shadow:0 12px 34px rgba(0,0,0,.55);">
+        <button onClick="{{ onVPrev }}" title="previous page" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border:1px solid #2a302d;background:#161a18;border-radius:7px;color:#b3b9b4;cursor:pointer;font-size:14px;font-family:inherit;" style-hover="border-color:#39413d;color:#cdd3cf;">{{ iPrev }}</button>
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#b3b9b4;">
+          <input value="{{ vPage }}" onChange="{{ onVGotoInput }}" style="width:36px;text-align:center;background:#0e110f;border:1px solid #2a302d;border-radius:5px;padding:4px 0;color:#dfe4e1;font-family:inherit;font-size:11px;">
+          <span style="color:#a4aba5;">/ {{ viewerPageCount }}</span>
+        </div>
+        <button onClick="{{ onVNext }}" title="next page" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border:1px solid #2a302d;background:#161a18;border-radius:7px;color:#b3b9b4;cursor:pointer;font-size:14px;font-family:inherit;" style-hover="border-color:#39413d;color:#cdd3cf;">{{ iNext }}</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== SUBMITTAL GENERATOR ===== -->
+  <sc-if value="{{ subOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:60;background:#0c0e0d;display:flex;flex-direction:column;animation:dlin .2s ease both;">
+      <!-- header -->
+      <div style="flex:none;display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:#0e110f;border-bottom:1px solid #20251f;">
+        <div style="display:flex;align-items:center;gap:14px;min-width:0;">
+          <div style="display:flex;align-items:center;gap:9px;"><span style="color:#5fd06f;font-size:14px;">{{ iBrand }}</span><span style="font-weight:800;letter-spacing:1px;font-size:13px;color:#eef2ef;">SUBMITTAL GENERATOR</span></div>
+          <span style="color:#3a403c;">/</span>
+          <span style="font-size:12px;color:#b3b9b4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ sub.project }}</span>
+          <span style="font-size:11px;color:#a4aba5;flex:none;">{{ subLineCount }} items · {{ subTotalPages }} pp</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;flex:none;">
+          <div style="display:flex;border:1px solid #262c28;border-radius:6px;overflow:hidden;">
+            <button onClick="{{ onScrollPages }}" title="scroll pages" style="{{ scrollStyle }}">SCROLL</button>
+            <button onClick="{{ onSinglePage }}" title="one page" style="{{ singleStyle }}">1 PAGE</button>
+          </div>
+          <button onClick="{{ onOpenFindSub }}" title="find (Ctrl+F)" style="display:flex;align-items:center;gap:6px;height:30px;padding:0 11px;border:1px solid #262c28;background:#121614;border-radius:6px;color:#cdd3cf;cursor:pointer;font-size:11px;letter-spacing:.3px;font-family:inherit;" style-hover="border-color:#39413d;">{{ iSearch }} FIND</button>
+          <div style="display:flex;align-items:center;gap:2px;border:1px solid #262c28;border-radius:6px;overflow:hidden;">
+            <button onClick="{{ onZoomOut }}" title="zoom out" style="display:flex;align-items:center;justify-content:center;width:28px;height:30px;background:#121614;border:none;color:#b3b9b4;cursor:pointer;font-size:15px;font-family:inherit;" style-hover="background:#1a1e1c;color:#cdd3cf;">{{ iMinus }}</button>
+            <button onClick="{{ onZoomReset }}" title="reset zoom" style="min-width:46px;height:30px;background:#121614;border:none;border-left:1px solid #262c28;border-right:1px solid #262c28;color:#cdd3cf;cursor:pointer;font-size:11px;font-family:inherit;" style-hover="background:#1a1e1c;">{{ previewZoomPct }}</button>
+            <button onClick="{{ onZoomIn }}" title="zoom in" style="display:flex;align-items:center;justify-content:center;width:28px;height:30px;background:#121614;border:none;color:#b3b9b4;cursor:pointer;font-size:15px;font-family:inherit;" style-hover="background:#1a1e1c;color:#cdd3cf;">{{ iPlus }}</button>
+          </div>
+          <span style="width:1px;height:18px;background:#2a302d;"></span>
+          <div style="position:relative;display:flex;">
+            <button onClick="{{ onSaveVersion }}" style="display:flex;align-items:center;gap:6px;height:31px;padding:0 12px;border:1px solid #2a4a32;background:#13211a;border-radius:6px 0 0 6px;color:#5fd06f;font-weight:600;font-size:11px;letter-spacing:.3px;cursor:pointer;font-family:inherit;" style-hover="background:#18291f;">{{ saveIcon }} {{ saveLabel }}</button>
+            <button onClick="{{ onToggleSaveMenu }}" title="save options" style="display:flex;align-items:center;justify-content:center;width:22px;height:31px;border:1px solid #2a4a32;border-left:none;background:#13211a;border-radius:0 6px 6px 0;color:#5fd06f;font-size:9px;cursor:pointer;font-family:inherit;" style-hover="background:#18291f;">{{ iCaret }}</button>
+            <sc-if value="{{ saveMenuOpen }}" hint-placeholder-val="{{ false }}">
+              <div onClick="{{ onToggleSaveMenu }}" style="position:fixed;inset:0;z-index:29;"></div>
+              <div style="position:absolute;top:35px;right:0;z-index:30;width:200px;background:#141816;border:1px solid #2a302d;border-radius:8px;padding:5px;box-shadow:0 14px 36px rgba(0,0,0,.6);">
+                <button onClick="{{ onSaveVersion }}" style="display:block;width:100%;text-align:left;padding:8px 10px;background:transparent;border:none;border-radius:6px;cursor:pointer;font-family:inherit;color:#cdd3cf;font-size:11.5px;" style-hover="background:#1d2320;">Save</button>
+                <button onClick="{{ onSaveAsNew }}" style="display:block;width:100%;text-align:left;padding:8px 10px;background:transparent;border:none;border-radius:6px;cursor:pointer;font-family:inherit;color:#cdd3cf;font-size:11.5px;" style-hover="background:#1d2320;">Save as New</button>
+              </div>
+            </sc-if>
+          </div>
+          <button onClick="{{ onToggleVersions }}" style="display:flex;align-items:center;gap:6px;height:31px;padding:0 12px;border:1px solid #262c28;background:#121614;border-radius:6px;color:#cdd3cf;font-size:11px;letter-spacing:.3px;cursor:pointer;font-family:inherit;" style-hover="border-color:#39413d;">{{ iHistory }} VERSIONS {{ versionCountLabel }}</button>
+          <span style="width:1px;height:18px;background:#2a302d;"></span>
+          <button onClick="{{ onShareSubmittal }}" style="display:flex;align-items:center;gap:6px;height:31px;padding:0 12px;border:1px solid #262c28;background:#121614;border-radius:6px;color:#cdd3cf;font-size:11px;letter-spacing:.3px;cursor:pointer;font-family:inherit;" style-hover="border-color:#39413d;">{{ iShare }} SHARE</button>
+          <button onClick="{{ onExport }}" style="display:flex;align-items:center;gap:7px;height:31px;padding:0 14px;background:#3fb950;border:none;border-radius:6px;color:#06210d;font-weight:700;font-size:11.5px;letter-spacing:.4px;cursor:pointer;font-family:inherit;" style-hover="background:#4fce62;">{{ iDownload }} EXPORT</button>
+          <button onClick="{{ onCloseSubmittal }}" style="display:flex;align-items:center;gap:7px;height:31px;padding:0 12px;background:#1a1e1c;border:1px solid #2a302d;border-radius:6px;color:#cdd3cf;font-weight:600;font-size:11px;letter-spacing:.4px;cursor:pointer;font-family:inherit;" style-hover="border-color:#39413d;">CLOSE {{ iClose }}</button>
+        </div>
+      </div>
+
+      <!-- find bar -->
+      <sc-if value="{{ findOpenSub }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;top:60px;right:24px;z-index:40;display:flex;align-items:center;gap:8px;background:#0e110f;border:1px solid #2a302d;border-radius:9px;padding:6px 8px;box-shadow:0 12px 32px rgba(0,0,0,.55);">
+          
+          <input id="findInput" value="{{ findQuery }}" onInput="{{ onFindInput }}" placeholder="find in document" style="width:170px;background:transparent;border:none;color:#dfe4e1;font-family:inherit;font-size:12px;">
+          <span style="font-size:10.5px;color:#b2b8b3;min-width:46px;text-align:right;">{{ findStat }}</span>
+          <button onClick="{{ onFindPrev }}" title="previous match" style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;border:1px solid #2a302d;background:#161a18;border-radius:6px;color:#b3b9b4;cursor:pointer;font-size:13px;font-family:inherit;" style-hover="border-color:#39413d;color:#cdd3cf;">{{ iPrev }}</button>
+          <button onClick="{{ onFindNext }}" title="next match" style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;border:1px solid #2a302d;background:#161a18;border-radius:6px;color:#b3b9b4;cursor:pointer;font-size:13px;font-family:inherit;" style-hover="border-color:#39413d;color:#cdd3cf;">{{ iNext }}</button>
+          <button onClick="{{ onCloseFind }}" title="close" style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;border:1px solid #2a302d;background:#161a18;border-radius:6px;color:#b3b9b4;cursor:pointer;font-size:11px;font-family:inherit;" style-hover="border-color:#39413d;color:#cdd3cf;">{{ iClose }}</button>
+        </div>
+      </sc-if>
+
+      <!-- versions panel -->
+      <sc-if value="{{ versionsOpen }}" hint-placeholder-val="{{ false }}">
+        <div onClick="{{ onCloseVersions }}" style="position:fixed;inset:0;z-index:39;"></div>
+        <div style="position:absolute;top:60px;right:24px;z-index:40;width:300px;background:#0e110f;border:1px solid #2a302d;border-radius:9px;padding:10px;box-shadow:0 12px 32px rgba(0,0,0,.55);">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;">
+            <span style="font-size:10.5px;letter-spacing:1px;color:#b3b9b4;font-weight:600;">SAVED VERSIONS {{ versionCountLabel }}</span>
+            <button onClick="{{ onCloseVersions }}" style="display:flex;align-items:center;justify-content:center;width:22px;height:22px;border:1px solid #2a302d;background:#161a18;border-radius:5px;color:#b3b9b4;cursor:pointer;font-size:10px;font-family:inherit;">{{ iClose }}</button>
+          </div>
+          <sc-if value="{{ hasVersions }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:4px;max-height:300px;overflow-y:auto;">
+              <sc-for list="{{ versionList }}" as="v" hint-placeholder-count="2">
+                <div style="display:flex;align-items:center;gap:8px;background:#121614;border:1px solid #232925;border-radius:6px;padding:7px 9px;">
+                  <button onClick="{{ v.onLoad }}" style="flex:1;text-align:left;background:transparent;border:none;color:#cdd3cf;cursor:pointer;font-family:inherit;font-size:11px;line-height:1.35;">{{ v.name }}</button>
+                  <button onClick="{{ v.onDelete }}" title="delete" style="display:flex;align-items:center;justify-content:center;flex:none;width:22px;height:22px;border:1px solid #3a2422;background:#1a1210;border-radius:5px;color:#c4544f;cursor:pointer;font-size:10px;font-family:inherit;">{{ iClose }}</button>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ noVersions }}" hint-placeholder-val="{{ true }}">
+            <div style="font-size:10.5px;color:#a7aea8;line-height:1.5;padding:6px 2px;">No saved versions yet. Click <span style="color:#5fd06f;">↓ Save version</span> to store the current submittal setup.</div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <!-- body: config + preview -->
+      <div style="flex:1;display:grid;grid-template-columns:372px 1fr;grid-template-rows:minmax(0,1fr);min-height:0;">
+
+        <!-- config rail -->
+        <div style="border-right:1px solid #1b201e;background:#0e110f;display:flex;flex-direction:column;min-height:0;">
+          <div style="display:flex;gap:2px;padding:0 8px;background:#0c0f0e;border-bottom:1px solid #1b201e;flex:none;">
+            <button onClick="{{ onTabProject }}" style="{{ tabProjectStyle }}">Project</button>
+            <button onClick="{{ onTabItems }}" style="{{ tabItemsStyle }}">Items</button>
+            <button onClick="{{ onTabLayout }}" style="{{ tabLayoutStyle }}">Layout</button>
+            <button onClick="{{ onTabIndex }}" style="{{ tabIndexStyle }}">Index</button>
+          </div>
+          <div class="scry" style="flex:1;min-height:0;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:24px;">
+
+          <section style="{{ tabProjectDisp }}">
+            <div style="font-size:10.5px;letter-spacing:1.5px;color:#a4aba5;font-weight:600;margin:0 0 14px;">PROJECT</div>
+            <div style="margin-bottom:13px;"><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Project name</label>
+              <sc-if value="{{ hasProjects }}" hint-placeholder-val="{{ true }}">
+                <select value="{{ projectSelectValue }}" onChange="{{ onPickProject }}" style="width:100%;background:#121614;border:1px solid #2a4a32;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"><option value="">Select a project…</option><sc-for list="{{ projectOptions }}" as="o" hint-placeholder-count="2"><option value="{{ o.id }}">{{ o.name }}</option></sc-for></select>
+              </sc-if>
+              <sc-if value="{{ noProjects }}" hint-placeholder-val="{{ false }}">
+                <input value="{{ sub.project }}" onChange="{{ subH.project }}" placeholder="No saved projects — type a name" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;">
+              </sc-if>
+            </div>
+            <div style="display:flex;gap:10px;margin-bottom:13px;">
+              <div style="flex:1;"><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Project address</label><input value="{{ sub.address }}" onChange="{{ subH.address }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"></div>
+              <div style="width:104px;"><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Proj. no.</label><input value="{{ sub.projectNumber }}" onChange="{{ subH.projectNumber }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"></div>
+            </div>
+            <div style="display:flex;gap:8px;margin-bottom:13px;"><div style="flex:1;"><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">City</label><input value="{{ sub.city }}" onChange="{{ subH.city }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"></div><div style="width:58px;"><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">State</label><input value="{{ sub.state }}" onChange="{{ subH.state }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"></div><div style="width:80px;"><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">ZIP</label><input value="{{ sub.zip }}" onChange="{{ subH.zip }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"></div></div>
+            <div style="display:flex;gap:10px;margin-bottom:13px;">
+              <div style="flex:1;"><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Project manager</label><input value="{{ sub.projectManager }}" onChange="{{ subH.projectManager }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"></div>
+              <div style="flex:1;"><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Designer</label><input value="{{ sub.designer }}" onChange="{{ subH.designer }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"></div>
+            </div>
+            <div style="margin-bottom:13px;"><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Submittal title</label><input value="{{ sub.title }}" onChange="{{ subH.title }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"></div>
+            <div style="display:flex;gap:10px;margin-bottom:13px;">
+              <div style="flex:1;"><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Submittal status</label><input value="{{ sub.status }}" onChange="{{ subH.status }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"></div>
+              <div style="width:78px;"><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Rev</label><input value="{{ sub.revision }}" onChange="{{ subH.revision }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"></div>
+            </div>
+            <div style="margin-bottom:13px;"><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Date</label><input type="date" value="{{ sub.date }}" onChange="{{ subH.date }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:7px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"></div>
+            <div style="margin-bottom:13px;"><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Prepared by</label><input value="{{ sub.preparedName }}" onChange="{{ subH.preparedName }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"></div>
+            <div><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Email</label><input value="{{ sub.preparedEmail }}" onChange="{{ subH.preparedEmail }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"></div>
+          </section>
+
+          <section style="{{ tabItemsDisp }}">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin:0 0 12px;">
+              <span style="font-size:10.5px;letter-spacing:1.5px;color:#a4aba5;font-weight:600;">SUBMITTAL DATA</span>
+              <span style="font-size:10px;color:#5fae6a;">{{ subLineCount }} lines</span>
+            </div>
+            <div style="font-size:9.5px;color:#a7aea8;margin-bottom:7px;line-height:1.5;">Paste CSV — columns: Manufacturer, Model, Description, Qty. Datasheets are matched automatically from the library by model.</div>
+            <div style="display:flex;gap:8px;margin-bottom:8px;">
+              <label style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;height:32px;background:#121614;border:1px solid #2a4a32;border-radius:6px;cursor:pointer;color:#5fd06f;font-size:11px;letter-spacing:.3px;" style-hover="background:#16201a;"><span>{{ iUpload }}</span> Import Submittal Data<input type="file" accept=".csv,text/csv" onChange="{{ onImportCBOM }}" style="display:none;"></label>
+              <button onClick="{{ onDownloadTemplate }}" style="flex:none;display:flex;align-items:center;gap:6px;height:32px;padding:0 12px;background:#121614;border:1px solid #262c28;border-radius:6px;cursor:pointer;color:#cdd3cf;font-size:11px;letter-spacing:.3px;font-family:inherit;" style-hover="border-color:#39413d;"><span>{{ iDownload }}</span> Template</button>
+            </div>
+            <textarea value="{{ sub.csv }}" onChange="{{ subH.csv }}" spellcheck="false" style="width:100%;height:150px;resize:vertical;background:#0c0f0e;border:1px solid #262c28;border-radius:6px;padding:9px 10px;color:#9fd6a6;font-family:inherit;font-size:10px;line-height:1.5;white-space:pre;"></textarea>
+            <div style="display:flex;gap:14px;margin-top:9px;font-size:10.5px;">
+              <span style="color:#3fb950;">✓ {{ subMatched }} matched to library</span>
+              <sc-if value="{{ subHasUnmatched }}" hint-placeholder-val="{{ false }}"><span style="color:#c4544f;">✕ {{ subUnmatched }} unmatched</span></sc-if>
+            </div>
+            <sc-if value="{{ subHasUnmatched }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:9px;border:1px solid #3a2422;background:#1a1210;border-radius:6px;padding:9px 10px;">
+                <div style="font-size:9px;letter-spacing:.5px;color:#c4544f;font-weight:600;margin-bottom:6px;">NO DATASHEET IN LIBRARY</div>
+                <sc-for list="{{ subUnmatchedList }}" as="u" hint-placeholder-count="1">
+                  <div style="font-size:10px;color:#b58a86;line-height:1.6;">{{ u }}</div>
+                </sc-for>
+              </div>
+            </sc-if>
+          </section>
+
+          <section style="{{ tabCompanyDisp }}">
+            <div style="font-size:10.5px;letter-spacing:1.5px;color:#a4aba5;font-weight:600;margin:0 0 12px;">COMPANY</div>
+            <div style="margin-bottom:13px;"><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Company name</label><input value="{{ company.name }}" onChange="{{ subH.coName }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"></div>
+            <div style="margin-bottom:13px;"><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Street address</label><input value="{{ company.addr1 }}" onChange="{{ subH.coAddr1 }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"></div>
+            <div style="margin-bottom:13px;"><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">City, State ZIP</label><input value="{{ company.addr2 }}" onChange="{{ subH.coAddr2 }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"></div>
+            <div style="display:flex;gap:10px;">
+              <div style="flex:1;"><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Phone</label><input value="{{ company.phone }}" onChange="{{ subH.coPhone }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"></div>
+              <div style="flex:1;"><label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:5px;display:block;">Website</label><input value="{{ company.web }}" onChange="{{ subH.coWeb }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;"></div>
+            </div>
+            <label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin:15px 0 6px;display:block;">Company logo</label>
+            <sc-if value="{{ hasLogo }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:12px;background:#121614;border:1px solid #262c28;border-radius:7px;padding:11px;">
+                <div style="background:#fff;border-radius:4px;padding:6px 9px;display:flex;align-items:center;justify-content:center;">{{ logoConfig }}</div>
+                <div style="display:flex;flex-direction:column;gap:6px;flex:1;">
+                  <span style="font-size:10.5px;color:#b3b9b4;">Logo loaded</span>
+                  <button onClick="{{ onClearLogo }}" style="align-self:flex-start;font-size:10px;color:#c4544f;background:transparent;border:1px solid #3a2422;border-radius:5px;padding:4px 9px;cursor:pointer;font-family:inherit;">remove</button>
+                </div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ noLogo }}" hint-placeholder-val="{{ true }}">
+              <label style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;background:#0c0f0e;border:1px dashed #313a35;border-radius:7px;padding:18px;cursor:pointer;" style-hover="border-color:#3fb950;">
+                <span style="font-size:18px;color:#3fb950;">{{ iUpload }}</span>
+                <span style="font-size:11px;color:#b3b9b4;">Choose logo file</span>
+                <span style="font-size:9px;color:#9ea69f;">PNG, JPG, SVG or TIFF · used on cover + footer</span>
+                <input type="file" accept="image/png,image/jpeg,image/svg+xml,image/tiff,.tif,.tiff,image/*" onChange="{{ onLogoFile }}" style="display:none;">
+              </label>
+            </sc-if>
+          </section>
+
+          <section style="{{ tabItemsDisp }}">
+            <div style="font-size:10.5px;letter-spacing:1.5px;color:#a4aba5;font-weight:600;margin:0 0 12px;">PACKAGE</div>
+            <label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin-bottom:6px;display:block;">Organize datasheets by</label>
+            <div style="display:flex;border:1px solid #232925;border-radius:6px;overflow:hidden;margin-bottom:14px;">
+              <button onClick="{{ subH.groupCat }}" style="{{ grpCatStyle }}">CATEGORY</button>
+              <button onClick="{{ subH.groupMfr }}" style="{{ grpMfrStyle }}">MANUFACTURER</button>
+            </div>
+            <button onClick="{{ subH.toggleIndex }}" style="{{ idxToggleStyle }}"><span style="color:#3fb950;font-size:11px;">{{ idxChk }}</span> Include index / bill of material page</button>
+          </section>
+
+          <section style="{{ tabLayoutDisp }}">
+            <div style="font-size:10.5px;letter-spacing:1.5px;color:#a4aba5;font-weight:600;margin:0 0 12px;">PAGE</div>
+            <label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin:0 0 6px;display:block;">Page size</label>
+            <select value="{{ sub.pageSize }}" onChange="{{ subH.pageSize }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;">
+              <option value="Letter">Letter — 8.5 × 11 in</option>
+              <option value="Legal">Legal — 8.5 × 14 in</option>
+              <option value="A4">A4 — 210 × 297 mm</option>
+              <option value="Tabloid">Tabloid — 11 × 17 in</option>
+            </select>
+            <label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin:13px 0 6px;display:block;">Orientation</label>
+            <div style="display:flex;border:1px solid #232925;border-radius:6px;overflow:hidden;">
+              <button onClick="{{ subH.orientPortrait }}" style="{{ portStyle }}">PORTRAIT</button>
+              <button onClick="{{ subH.orientLandscape }}" style="{{ landStyle }}">LANDSCAPE</button>
+            </div>
+            <label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin:13px 0 6px;display:flex;justify-content:space-between;">Margins <input type="number" min="0.3" max="1.5" step="0.05" value="{{ sub.margin }}" onChange="{{ subH.margin }}" style="width:54px;background:#121614;border:1px solid #262c28;border-radius:5px;padding:3px 6px;color:#dfe4e1;font-family:inherit;font-size:11px;text-align:right;"></label>
+            <input type="range" min="0.3" max="1.5" step="0.05" value="{{ sub.margin }}" onChange="{{ subH.margin }}" style="width:100%;accent-color:#3fb950;cursor:pointer;">
+          </section>
+
+          <section style="{{ tabLayoutDisp }}">
+            <div style="font-size:10.5px;letter-spacing:1.5px;color:#a4aba5;font-weight:600;margin:0 0 12px;">TYPOGRAPHY</div>
+
+            <div style="font-size:9px;letter-spacing:1px;color:#3fb950;font-weight:600;margin-bottom:9px;">DOCUMENT (DATASHEETS · FOOTER)</div>
+            <label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin:0 0 6px;display:block;">Font</label>
+            <select value="{{ sub.font }}" onChange="{{ subH.font }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;">
+              <option value="Arial, 'Helvetica Neue', Helvetica, sans-serif">Arial</option>
+              <option value="'Helvetica Neue', Helvetica, Arial, sans-serif">Helvetica</option>
+              <option value="Calibri, Candara, Segoe, 'Segoe UI', sans-serif">Calibri</option>
+              <option value="Verdana, Geneva, sans-serif">Verdana</option>
+              <option value="Tahoma, Geneva, sans-serif">Tahoma</option>
+              <option value="'Times New Roman', Times, serif">Times New Roman</option>
+              <option value="Georgia, 'Times New Roman', serif">Georgia</option>
+            </select>
+            <label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin:13px 0 6px;display:flex;justify-content:space-between;">Body text size <input type="number" min="8" max="13" step="0.5" value="{{ fontSize }}" onChange="{{ subH.fontSize }}" style="width:54px;background:#121614;border:1px solid #262c28;border-radius:5px;padding:3px 6px;color:#dfe4e1;font-family:inherit;font-size:11px;text-align:right;"></label>
+            <input type="range" min="8" max="13" step="0.5" value="{{ fontSize }}" onChange="{{ subH.fontSize }}" style="width:100%;accent-color:#3fb950;cursor:pointer;">
+
+            <div style="font-size:9px;letter-spacing:1px;color:#3fb950;font-weight:600;margin:20px 0 9px;border-top:1px solid #1f2421;padding-top:16px;">COVER PAGE</div>
+            <label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin:0 0 6px;display:block;">Font</label>
+            <select value="{{ sub.coverFont }}" onChange="{{ subH.coverFont }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;">
+              <option value="">Match document</option>
+              <option value="Arial, 'Helvetica Neue', Helvetica, sans-serif">Arial</option>
+              <option value="'Helvetica Neue', Helvetica, Arial, sans-serif">Helvetica</option>
+              <option value="Calibri, Candara, Segoe, 'Segoe UI', sans-serif">Calibri</option>
+              <option value="Verdana, Geneva, sans-serif">Verdana</option>
+              <option value="Tahoma, Geneva, sans-serif">Tahoma</option>
+              <option value="'Times New Roman', Times, serif">Times New Roman</option>
+              <option value="Georgia, 'Times New Roman', serif">Georgia</option>
+            </select>
+            <label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin:13px 0 6px;display:flex;justify-content:space-between;">Title size <input type="number" min="18" max="40" step="1" value="{{ sub.coverTitleSize }}" onChange="{{ subH.coverTitleSize }}" style="width:54px;background:#121614;border:1px solid #262c28;border-radius:5px;padding:3px 6px;color:#dfe4e1;font-family:inherit;font-size:11px;text-align:right;"></label>
+            <input type="range" min="18" max="40" step="1" value="{{ sub.coverTitleSize }}" onChange="{{ subH.coverTitleSize }}" style="width:100%;accent-color:#3fb950;cursor:pointer;">
+            <label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin:13px 0 6px;display:block;">Text format</label>
+            <div style="display:flex;border:1px solid #262c28;border-radius:6px;overflow:hidden;width:max-content;"><button onClick="{{ oncoverBold }}" style="{{ coverBStyle }}">B</button><button onClick="{{ oncoverItalic }}" style="{{ coverIStyle }}">I</button><button onClick="{{ oncoverUnder }}" style="{{ coverUStyle }}">U</button></div>
+            <label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin:13px 0 6px;display:block;">Alignment</label>
+            <div style="display:flex;border:1px solid #262c28;border-radius:6px;overflow:hidden;width:max-content;"><button onClick="{{ oncoverAlnleft }}" style="{{ coverAlnleftStyle }}">{{ iAlignLeft }}</button><button onClick="{{ oncoverAlncenter }}" style="{{ coverAlncenterStyle }}">{{ iAlignCenter }}</button><button onClick="{{ oncoverAlnright }}" style="{{ coverAlnrightStyle }}">{{ iAlignRight }}</button></div>
+
+            <div style="font-size:9px;letter-spacing:1px;color:#3fb950;font-weight:600;margin:20px 0 9px;border-top:1px solid #1f2421;padding-top:16px;">INDEX PAGE</div>
+            <label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin:0 0 6px;display:block;">Font</label>
+            <select value="{{ sub.indexFont }}" onChange="{{ subH.indexFont }}" style="width:100%;background:#121614;border:1px solid #262c28;border-radius:6px;padding:8px 10px;color:#dfe4e1;font-family:inherit;font-size:12px;">
+              <option value="">Match document</option>
+              <option value="Arial, 'Helvetica Neue', Helvetica, sans-serif">Arial</option>
+              <option value="'Helvetica Neue', Helvetica, Arial, sans-serif">Helvetica</option>
+              <option value="Calibri, Candara, Segoe, 'Segoe UI', sans-serif">Calibri</option>
+              <option value="Verdana, Geneva, sans-serif">Verdana</option>
+              <option value="Tahoma, Geneva, sans-serif">Tahoma</option>
+              <option value="'Times New Roman', Times, serif">Times New Roman</option>
+              <option value="Georgia, 'Times New Roman', serif">Georgia</option>
+            </select>
+            <label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin:13px 0 6px;display:flex;justify-content:space-between;">Heading size <input type="number" min="14" max="34" step="1" value="{{ sub.indexHeadingSize }}" onChange="{{ subH.indexHeadingSize }}" style="width:54px;background:#121614;border:1px solid #262c28;border-radius:5px;padding:3px 6px;color:#dfe4e1;font-family:inherit;font-size:11px;text-align:right;"></label>
+            <input type="range" min="14" max="34" step="1" value="{{ sub.indexHeadingSize }}" onChange="{{ subH.indexHeadingSize }}" style="width:100%;accent-color:#3fb950;cursor:pointer;">
+            <label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin:13px 0 6px;display:flex;justify-content:space-between;">Item text size <input type="number" min="8" max="15" step="0.5" value="{{ sub.indexItemSize }}" onChange="{{ subH.indexItemSize }}" style="width:54px;background:#121614;border:1px solid #262c28;border-radius:5px;padding:3px 6px;color:#dfe4e1;font-family:inherit;font-size:11px;text-align:right;"></label>
+            <input type="range" min="8" max="15" step="0.5" value="{{ sub.indexItemSize }}" onChange="{{ subH.indexItemSize }}" style="width:100%;accent-color:#3fb950;cursor:pointer;">
+            <label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin:13px 0 6px;display:flex;justify-content:space-between;">Group header size <input type="number" min="9" max="18" step="0.5" value="{{ sub.indexGroupSize }}" onChange="{{ subH.indexGroupSize }}" style="width:54px;background:#121614;border:1px solid #262c28;border-radius:5px;padding:3px 6px;color:#dfe4e1;font-family:inherit;font-size:11px;text-align:right;"></label>
+            <input type="range" min="9" max="18" step="0.5" value="{{ sub.indexGroupSize }}" onChange="{{ subH.indexGroupSize }}" style="width:100%;accent-color:#3fb950;cursor:pointer;">
+            <label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin:13px 0 6px;display:block;">Text format</label>
+            <div style="display:flex;border:1px solid #262c28;border-radius:6px;overflow:hidden;width:max-content;"><button onClick="{{ onindexBold }}" style="{{ indexBStyle }}">B</button><button onClick="{{ onindexItalic }}" style="{{ indexIStyle }}">I</button><button onClick="{{ onindexUnder }}" style="{{ indexUStyle }}">U</button></div>
+            <label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin:13px 0 6px;display:block;">Alignment</label>
+            <div style="display:flex;border:1px solid #262c28;border-radius:6px;overflow:hidden;width:max-content;"><button onClick="{{ onindexAlnleft }}" style="{{ indexAlnleftStyle }}">{{ iAlignLeft }}</button><button onClick="{{ onindexAlncenter }}" style="{{ indexAlncenterStyle }}">{{ iAlignCenter }}</button><button onClick="{{ onindexAlnright }}" style="{{ indexAlnrightStyle }}">{{ iAlignRight }}</button></div>
+          </section>
+
+          <section style="{{ tabIndexDisp }}">
+            <div style="font-size:10.5px;letter-spacing:1.5px;color:#a4aba5;font-weight:600;margin:0 0 8px;">INDEX PAGE</div>
+            <label style="font-size:9.5px;letter-spacing:.5px;color:#a4aba5;text-transform:uppercase;margin:0 0 4px;display:block;">Category order</label>
+            <div style="font-size:9.5px;color:#9ea69f;line-height:1.5;margin-bottom:10px;">Drag the arrows to set the order categories appear on the index and in the assembled package. Only applies when grouping by category.</div>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <sc-for list="{{ categoryOrderRows }}" as="c" hint-placeholder-count="5">
+                <div onDragEnter="{{ c.onDragEnter }}" onDragOver="{{ c.onDragOver }}" onDrop="{{ c.onDrop }}" onDragEnd="{{ c.onDragEnd }}" style="{{ c.wrapperStyle }}">
+                  <div draggable="true" onDragStart="{{ c.onDragStart }}" style="{{ c.innerStyle }}">
+                    <span style="color:#5fae6a;flex:none;display:flex;">{{ iGrip }}</span>
+                    <span style="flex:none;width:16px;font-size:10px;color:#7c847e;font-weight:700;">{{ c.num }}</span>
+                    <span style="flex:1;font-size:11.5px;color:#dde3df;font-weight:500;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ c.name }}</span>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </section>
+
+          <section style="{{ tabItemsDisp }}">
+            <div style="border-top:1px solid #1f2421;padding-top:14px;font-size:9.5px;color:#9ea69f;line-height:1.6;">Cover, index, and datasheet pages are generated from the fields above. Each matched line item inserts its library datasheet with the company footer and continuous page numbers. The final binary PDF merge runs server-side on export.</div>
+          </section>
+          </div>
+        </div>
+
+        <!-- assembled preview -->
+        <div style="position:relative;min-width:0;min-height:0;">
+        <div id="subPreview" ref="{{ setPreviewRef }}" class="scry" style="position:absolute;inset:0;overflow-y:auto;background:#2b2f2d;padding:34px 28px 60px;display:flex;flex-direction:column;align-items:center;gap:28px;font-family: {{ docFont }};font-size: {{ docBaseFs }};zoom: {{ previewZoom }};">
+
+          <!-- COVER -->
+          <div class="subpage" style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+            <span style="font-size:10px;letter-spacing:1.5px;color:#9aa3a0;">COVER</span>
+            <div style="width: {{ sheetW }};min-height: {{ sheetH }};background:#fff;color:#1a1a17;border-radius:2px;box-shadow:0 16px 44px rgba(0,0,0,.5);position:relative;overflow:hidden;font-family: {{ coverFontStyle }};">
+              <div style="position:absolute;left:28px;right:22px;top:26px;bottom:26px;border:1px solid #c2c2bb;border-radius:18px;pointer-events:none;"></div>
+              <div style="position:absolute;left:0;right:0;top:33%;padding:0 64px;{{ coverFmtStyle }}">
+                <div style="font-size: {{ coverProjFs }};color:#1a1a17;line-height:1.55;">{{ sub.project }}</div>
+                <div style="font-size: {{ coverAddrFs }};color:#1a1a17;line-height:1.55;">{{ sub.address }}</div>
+                <div style="font-size: {{ coverAddrFs }};color:#1a1a17;line-height:1.4;">{{ coverCityLine }}</div>
+                <div style="font-size: {{ coverTitleFs }};color:#e02424;line-height:1.7;">{{ sub.title }}</div>
+                <div style="font-size:13px;color:#6a6a62;margin-top:14px;display:none;">Project No. {{ sub.projectNumber }}</div>
+              </div>
+              <div style="position:absolute;left:52px;bottom:120px;font-size:10px;line-height:1.7;color:#444;">
+                <div style="color:#1a1a17;">Project No. {{ sub.projectNumber }}</div>
+                <div style="color:#1a1a17;margin-bottom:8px;">Revision {{ sub.revision }}</div>
+                <div>Prepared By:</div>
+                <div>{{ sub.preparedName }}</div>
+                <div style="color:#e02424;">{{ sub.preparedEmail }}</div>
+              </div>
+              <div style="position:absolute;left:50px;bottom:44px;display:flex;align-items:center;gap:11px;">
+                <sc-if value="{{ hasLogo }}" hint-placeholder-val="{{ false }}">{{ logoCover }}</sc-if>
+                <sc-if value="{{ noLogo }}" hint-placeholder-val="{{ true }}"><div style="height:50px;width:220px;border:1px dashed #b3b3aa;border-radius:5px;display:flex;align-items:center;justify-content:center;color:#9a9a90;font-size:10px;letter-spacing:2.5px;">COMPANY LOGO</div></sc-if>
+              </div>
+              <div style="position:absolute;right:48px;bottom:44px;text-align:right;font-size:8.5px;line-height:1.8;color:#9a9a90;">
+                <div>{{ company.addr1 }}</div><div>{{ company.addr2 }}</div><div>{{ company.phone }}</div><div>{{ company.web }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- INDEX -->
+          <sc-if value="{{ subIncludeIndex }}" hint-placeholder-val="{{ true }}">
+            <div class="subpage" style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+              <span style="font-size:10px;letter-spacing:1.5px;color:#9aa3a0;">INDEX</span>
+              <div style="width: {{ sheetW }};min-height: {{ sheetH }};background:#fff;color:#1a1a17;border-radius:2px;box-shadow:0 16px 44px rgba(0,0,0,.5);display:flex;flex-direction:column;position:relative;">
+                <div style="flex:1;padding: {{ marginPx }} {{ marginPx }} 16px;font-family: {{ indexFontStyle }};font-size: {{ indexItemFs }};{{ indexFmtStyle }}">
+                  <div style="display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid #1a1a17;padding-bottom:9px;margin-bottom:6px;">
+                    <span style="font-size: {{ indexHeadingFs }};font-weight:700;letter-spacing:.5px;">Fire Alarm Submittal Index</span>
+                    <span style="font-size:9.5px;color:#8a8a80;">Project No. {{ sub.projectNumber }} · Rev {{ sub.revision }}</span>
+                  </div>
+                  <div style="font-size:8.5px;letter-spacing:1px;color:#8a8a80;margin-bottom:16px;">{{ subLineCount }} items · {{ subTotalPages }} pages</div>
+                  <div style="display:grid;grid-template-columns:92px 84px 1fr 34px 52px;gap:8px;padding:4px 4px;border-bottom:1.5px solid #1a1a17;font-size:0.78em;letter-spacing:.5px;color:#6a6a62;font-weight:700;">
+                    <span>PART#</span><span>MFG.</span><span>DESCRIPTION</span><span style="text-align:right;">QTY</span><span style="text-align:right;">PAGE#</span>
+                  </div>
+                  <sc-for list="{{ indexGroups }}" as="g" hint-placeholder-count="3">
+                    <div style="font-size: {{ indexGroupFs }};font-weight:700;color:#1a1a17;background:#eeeee8;padding:3px 9px;margin-top:5px;letter-spacing:.5px;border-left:3px solid #3a3a37;">{{ g.label }}</div>
+                    <sc-for list="{{ g.items }}" as="it" hint-placeholder-count="3">
+                      <a href="{{ it.href }}" onClick="{{ it.onClick }}" style="{{ it.rowStyle }}" style-hover="background:#eef4fb;">
+                        <span style="font-weight:600;">{{ it.part }}</span>
+                        <span style="color:#5a5a52;">{{ it.mfr }}</span>
+                        <span style="color:#4a4a42;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ it.desc }}</span>
+                        <span style="text-align:right;font-weight:700;">{{ it.qty }}</span>
+                        <span style="{{ it.pageStyle }}">{{ it.page }}</span>
+                      </a>
+                    </sc-for>
+                  </sc-for>
+                  <div style="display:grid;grid-template-columns:92px 84px 1fr 34px 52px;gap:8px;padding:9px 4px;font-size:0.95em;font-weight:700;color:#1a1a17;border-top:1.5px solid #1a1a17;margin-top:4px;">
+                    <span></span><span></span><span style="text-align:right;">TOTAL DEVICES</span><span style="text-align:right;">{{ subTotalQty }}</span><span></span>
+                  </div>
+                </div>
+                <div style="margin-top:auto;padding:16px {{ marginPx }} 0;">
+                  <div style="height:3px;background:#1a1a17;margin-bottom:13px;"></div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:20px;padding-bottom:13px;">
+                    <sc-if value="{{ hasLogo }}" hint-placeholder-val="{{ false }}">{{ logoFooter }}</sc-if>
+                    <sc-if value="{{ noLogo }}" hint-placeholder-val="{{ true }}"><div style="height:46px;width:210px;border:1px dashed #bdbdb4;border-radius:4px;display:flex;align-items:center;justify-content:center;color:#a4a499;font-size:9px;letter-spacing:2px;">COMPANY LOGO</div></sc-if>
+                    <div style="text-align:right;font-size:1em;line-height:1.55;color:#3a3a33;">
+                      <div>{{ sub.project }}</div><div>{{ footerTitle }}</div><div>{{ footerDate }}</div><div>{{ indexFooter }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- DATASHEET PAGES -->
+          <sc-for list="{{ dsSections }}" as="s" hint-placeholder-count="3">
+            <sc-for list="{{ s.items }}" as="it" hint-placeholder-count="2">
+              <div id="{{ it.pageId }}" class="subpage" style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+                <span style="font-size:10px;letter-spacing:1px;color:#9aa3a0;">{{ it.model }}</span>
+                <div style="width: {{ sheetW }};min-height: {{ sheetH }};background:#fff;color:#1a1a17;border-radius:2px;box-shadow:0 16px 44px rgba(0,0,0,.5);display:flex;flex-direction:column;position:relative;">
+                    <div style="flex:1;padding: {{ marginPx }} {{ marginPx }} 16px;display:flex;flex-direction:column;">
+                    <sc-if value="{{ it.hasPdf }}" hint-placeholder-val="{{ false }}">
+                      <div style="flex:1;border:1px solid #cdcdc4;border-radius:3px;overflow:hidden;display:flex;flex-direction:column;background:#fff;min-height:300px;">{{ it.canvas }}</div>
+                    </sc-if>
+                    <sc-if value="{{ it.noPdf }}" hint-placeholder-val="{{ true }}">
+                    <div style="flex:1;border:1px solid #cdcdc4;border-radius:3px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:repeating-linear-gradient(45deg,#e6e6df,#e6e6df 11px,#eeeee8 11px,#eeeee8 22px);min-height:300px;">
+                      <span style="font-size:10px;letter-spacing:1.5px;color:#8a8a80;background:#fff;padding:6px 14px;border-radius:3px;border:1px solid #dcdcd3;">MANUFACTURER DATASHEET — {{ it.model }}</span>
+                      <span style="font-size:9px;color:#a0a096;">{{ it.pagesNote }}</span>
+                    </div>
+                    </sc-if>
+                  </div>
+                  <div style="margin-top:auto;padding:16px {{ marginPx }} 0;">
+                    <div style="height:3px;background:#1a1a17;margin-bottom:13px;"></div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:20px;padding-bottom:13px;">
+                      <sc-if value="{{ hasLogo }}" hint-placeholder-val="{{ false }}">{{ logoFooter }}</sc-if>
+                      <sc-if value="{{ noLogo }}" hint-placeholder-val="{{ true }}"><div style="height:46px;width:210px;border:1px dashed #bdbdb4;border-radius:4px;display:flex;align-items:center;justify-content:center;color:#a4a499;font-size:9px;letter-spacing:2px;">COMPANY LOGO</div></sc-if>
+                      <div style="text-align:right;font-size:1em;line-height:1.55;color:#3a3a33;">
+                        <div>{{ sub.project }}</div><div>{{ footerTitle }}</div><div>{{ footerDate }}</div><div>{{ it.footer }}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </sc-for>
+          </sc-for>
+
+          <div style="font-size:10px;color:#b2b8b3;letter-spacing:.5px;padding:6px 0 20px;">— END OF SUBMITTAL · {{ subTotalPages }} PAGES —</div>
+        </div>
+        <!-- floating page navigation -->
+        <div style="position:absolute;left:50%;bottom:18px;transform:translateX(-50%);z-index:5;display:flex;align-items:center;gap:9px;background:rgba(13,16,14,.93);backdrop-filter:blur(7px);border:1px solid #2a302d;border-radius:11px;padding:7px 11px;box-shadow:0 12px 34px rgba(0,0,0,.55);">
+          <button onClick="{{ onPrevPage }}" title="previous page" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border:1px solid #2a302d;background:#161a18;border-radius:7px;color:#b3b9b4;cursor:pointer;font-size:14px;font-family:inherit;" style-hover="border-color:#39413d;color:#cdd3cf;">{{ iPrev }}</button>
+          <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#b3b9b4;">
+            <input value="{{ curPage }}" onChange="{{ onGotoInput }}" style="width:36px;text-align:center;background:#0e110f;border:1px solid #2a302d;border-radius:5px;padding:4px 0;color:#dfe4e1;font-family:inherit;font-size:11px;">
+            <span style="color:#a4aba5;">/ {{ navCount }}</span>
+          </div>
+          <button onClick="{{ onNextPage }}" title="next page" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border:1px solid #2a302d;background:#161a18;border-radius:7px;color:#b3b9b4;cursor:pointer;font-size:14px;font-family:inherit;" style-hover="border-color:#39413d;color:#cdd3cf;">{{ iNext }}</button>
+          <span style="width:1px;height:18px;background:#2a302d;"></span>
+          <select value="{{ curPage }}" onChange="{{ onGotoPage }}" style="max-width:210px;background:#0e110f;border:1px solid #2a302d;border-radius:7px;padding:6px 9px;color:#dfe4e1;font-family:inherit;font-size:11px;cursor:pointer;">
+            <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="3">
+              <option value="{{ n.idx }}">{{ n.label }}</option>
+            </sc-for>
+          </select>
+        </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+</div>
